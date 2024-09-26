@@ -7,13 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct window{
-    const char* title;
-    uint32_t height;
-    uint32_t width;
-    GLFWwindow* window;
-    bool is_initialized;
-}window;
+
 
 enum WINDOW_STATUS{
     BAD_GLAD_LOAD          = -4,
@@ -25,10 +19,10 @@ enum WINDOW_STATUS{
     WINDOW_STATUS_MAX      =  1
 };
 
-uint8_t win_init(const char* title, uint32_t height, uint32_t width, window* win);
-void win_destroy(window* window);
-void win_poll_events(window* win);
-void win_swap_buffers(window* win);
-bool win_should_close(window* win);
+uint8_t win_init(const char* title, uint32_t height, uint32_t width);
+void win_destroy();
+void win_poll_events();
+void win_swap_buffers();
+bool win_should_close();
 
 #endif 

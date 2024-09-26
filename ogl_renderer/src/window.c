@@ -2,6 +2,13 @@
 #include "logger.h"
 #include <stdlib.h>
 
+static struct window{
+    const char* title;
+    uint32_t height;
+    uint32_t width;
+    GLFWwindow* window;
+    bool is_initialized;
+} win;
 
 static void 
 resize_callback(GLFWwindow* window, int32_t width, int32_t height){
@@ -21,12 +28,7 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
 
 
 uint8_t 
-win_init(const char* title, uint32_t height, uint32_t width, window* win){
-    if(win == NULL) {
-       LOG_FATAL("calling win_init without actualy allocate win variable");
-       return BAD_PTR;
-    }
-
+win_init(const char* title, uint32_t height, uint32_t width){
     if(!glfwInit()){
         LOG_FATAL("cannot initialize glfw");
         return BAD_GLFW_INIT;
@@ -35,12 +37,12 @@ win_init(const char* title, uint32_t height, uint32_t width, window* win){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if((win->window = glfwCreateWindow(height, width, title, NULL, NULL)) == NULL){
+    if((win.window = glfwCreateWindow(height, width, title, NULL, NULL)) == NULL){
         LOG_FATAL("cannot create glfw window");
         return BAD_GLFW_WINDOW_CREATE;
     }
 
-    glfwMakeContextCurrent(win->window);
+    glfwMakeContextCurrent(win.window);
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
          LOG_FATAL("cannot load glad");
          return BAD_GLAD_LOAD;
@@ -52,48 +54,48 @@ win_init(const char* title, uint32_t height, uint32_t width, window* win){
     // glFrontFace(GL_CW);
     // glCullFace(GL_BACK);
 
-    glfwSetFramebufferSizeCallback(win->window, resize_callback);
-    glfwSetKeyCallback(win->window, key_input_callback);
+    glfwSetFramebufferSizeCallback(win.window, resize_callback);
+    glfwSetKeyCallback(win.window, key_input_callback);
     
-    win->is_initialized = true;
+    win.is_initialized = true;
     LOG_INFO("Window initialized");
     return OK;
 }
 
 void 
-win_destroy(window* win){
-    if(win->window == NULL){
+win_destroy(){
+    if(win.window == NULL){
         LOG_DEBUG("cannot destroy nullptr window");
         return;
     }
-    if(!win->is_initialized){
+    if(!win.is_initialized){
         LOG_DEBUG("cannot destroy not initialized window");
         return;        
     }
-    glfwDestroyWindow(win->window);
+    glfwDestroyWindow(win.window);
     glfwTerminate();
 }
 
 bool
-win_should_close(window* win){
-    if(!win->is_initialized){
+win_should_close(){
+    if(!win.is_initialized){
         LOG_DEBUG("calling win_should_close without initialization");
         return true;
     }
-    return glfwWindowShouldClose(win->window);
+    return glfwWindowShouldClose(win.window);
 }
 
 void 
-win_swap_buffers(window* win){
-    if(!win->is_initialized) {
+win_swap_buffers(){
+    if(!win.is_initialized) {
         LOG_DEBUG("calling swapBuffers without initialization");
         return;
     }
-    glfwSwapBuffers(win->window);
+    glfwSwapBuffers(win.window);
 }
 void
-win_poll_events(window* win){
-    if(!win->is_initialized){
+win_poll_events(){
+    if(!win.is_initialized){
         LOG_DEBUG("calling pollEvents without initialization");
         return;
     }

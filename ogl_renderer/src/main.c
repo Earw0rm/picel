@@ -2,14 +2,16 @@
 #include "window.h"
 #include <stdio.h>
 
-static window win;
+
 
 int main(int argc, char const *argv[])
 {
-    win_init("my first c window", 1024, 1024, &win);
-    while(!win_should_close(&win)){
-        win_poll_events(&win);
+    win_init("my first c window", 1024, 1024);
+    while(!win_should_close()){
+        
+        win_poll_events();
+        win_swap_buffers();
     }
-    win_destroy(&win);
+    win_destroy();
     return 0;
 }
