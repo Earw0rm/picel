@@ -10,13 +10,13 @@
 
 
 enum WINDOW_STATUS{
-    BAD_GLAD_LOAD          = -4,
-    BAD_GLFW_WINDOW_CREATE = -3,
-    BAD_PTR                = -2,
-    BAD_GLFW_INIT          = -1, 
+    BAD_DOUBLE_INITIALIZATION = -4,
+    BAD_GLAD_LOAD             = -3,
+    BAD_GLFW_WINDOW_CREATE    = -2,
+    BAD_GLFW_INIT             = -1, 
 
-    OK                     =  0,     
-    WINDOW_STATUS_MAX      =  1
+    OK                        =  0,     
+    WINDOW_STATUS_MAX         =  1
 };
 
 uint8_t win_init(const char* title, uint32_t height, uint32_t width);

@@ -29,6 +29,9 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
 
 uint8_t 
 win_init(const char* title, uint32_t height, uint32_t width){
+    if(win.is_initialized){
+        return BAD_DOUBLE_INITIALIZATION;
+    }
     if(!glfwInit()){
         LOG_FATAL("cannot initialize glfw");
         return BAD_GLFW_INIT;
