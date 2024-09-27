@@ -2,7 +2,8 @@
     "files.associations": {
         "stdint.h": "c",
         "stdbool.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "__config": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

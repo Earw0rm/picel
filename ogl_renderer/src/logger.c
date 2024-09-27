@@ -19,7 +19,7 @@ void log_output(log_level lvl, const char* msg, ...){
    va_list args;
    va_start(args, msg);
    printf("%s", LEVEL_STRING(lvl));
-   printf(msg, args);
+   vprintf(msg, args);
    printf(ENDL);
 }
 
