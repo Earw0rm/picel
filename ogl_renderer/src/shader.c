@@ -39,7 +39,7 @@ shader_read(const char* path, const char** shader_data){
        goto cleanup;
     }
 
-    (*shader_data) = malloc(sizeof(char) * sz);
+    (*shader_data) = malloc(sizeof(char) * (sz + 1) );
     if((*shader_data) == nullptr){
        LOG_ERROR("cannot allocate data for shader: %s \n %s", path, strerror(errno));
        ret = SHADER_STATUS_BAD_ALLOC;
@@ -136,8 +136,8 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
     sp->frag_shader_id = 
                 create_shader_and_compile(GL_FRAGMENT_SHADER, frag_shader_res, frag_shader_data);    
 
-    if(sp->vert_shader_id <= 0){
-        res = sp->vert_shader_id;
+    if(sp->frag_shader_id <= 0){
+        res = sp->frag_shader_id;
         goto shader_cleanup;
     }
 
@@ -160,9 +160,13 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
         goto shader_cleanup;
     } 
 
-
 shader_cleanup:
-
+    if(sp->vert_shader_id > 0){
+            glDeleteShader(sp->vert_shader_id);
+    }
+    if(sp->frag_shader_id > 0){
+            glDeleteShader(sp->frag_shader_id);
+    }
     if(vert_shader_data != nullptr){
         free((void*) vert_shader_data);
     }
@@ -171,12 +175,6 @@ shader_cleanup:
     }
 
     if(res != SHADER_STATUS_OK){
-        if(sp->vert_shader_id > 0){
-            glDeleteShader(sp->vert_shader_id);
-        }
-        if(sp->frag_shader_id > 0){
-            glDeleteShader(sp->frag_shader_id);
-        }
         if(sp->program != 0){
             glDeleteProgram(sp->program);
         }
@@ -190,6 +188,11 @@ void shader_shutdown(shader* sp){
     glDeleteShader(sp->vert_shader_id);    
 }
 
-void use(shader* sp){
+void shader_use(shader* sp){
+    LOG_DEBUG("Use shader with program_id: %i, vertex_shader: %i, fragment_shader: %i",
+              sp->program,
+              sp->vert_shader_id, 
+              sp->frag_shader_id);
+
     glUseProgram(sp->program);
 }

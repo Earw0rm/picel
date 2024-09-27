@@ -40,7 +40,7 @@ win_init(const char* title, uint32_t height, uint32_t width){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if((win.window = glfwCreateWindow(height, width, title, NULL, NULL)) == NULL){
+    if((win.window = glfwCreateWindow(width, height, title, nullptr, nullptr)) == nullptr){
         LOG_FATAL("cannot create glfw window");
         return BAD_GLFW_WINDOW_CREATE;
     }
@@ -51,7 +51,7 @@ win_init(const char* title, uint32_t height, uint32_t width){
          return BAD_GLAD_LOAD;
     }
 
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 
     // glEnable(GL_CULL_FACE);
     // glFrontFace(GL_CW);
@@ -67,7 +67,7 @@ win_init(const char* title, uint32_t height, uint32_t width){
 
 void 
 win_destroy(){
-    if(win.window == NULL){
+    if(win.window == nullptr){
         LOG_DEBUG("cannot destroy nullptr window");
         return;
     }

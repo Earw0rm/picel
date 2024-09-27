@@ -1,6 +1,6 @@
 #ifndef _SHADER_H_
 #define _SHADER_H_
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 typedef struct shader{
     GLint vert_shader_id;
@@ -32,6 +32,6 @@ int8_t shader_init(const char* vert_path,
 
 void shader_shutdown(shader* sp);
 
-void use(shader* sp);
+void shader_use(shader* sp);
 
 #endif 

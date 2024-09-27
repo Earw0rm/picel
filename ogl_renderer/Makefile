@@ -2,9 +2,9 @@ BUILD_DIR = ./build
 SOURCE_DIR = ./src
 COMPILER ?= clang
 LIBS_SRC = ./libs
-OPS = -g -Wvarargs -Wall -Werror -fvisibility=hidden -std=c23
+OPS = -g -Wvarargs -Wall -Werror -std=c23
 INCLUDE_FLAGS = -I./include -I./libs/include
-LINKER_FLAGS = -lglfw -lGL -lc 
+LINKER_FLAGS = -lc -lglfw -lGL -ldl -lpthread -lX11 -lXrandr -lXi
 OUT = renderer
 
 SRC_C_FILES = $(shell find $(SOURCE_DIR) -name '*.c')

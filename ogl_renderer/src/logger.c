@@ -1,7 +1,7 @@
 #include "logger.h"
-#include "stdint.h"
-#include "stdio.h"
-#include "stdarg.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 static const char* lvl2str[6] = {
     [LOG_LEVEL_FATAL] = "\033[0;41m[FATAL]: ",
