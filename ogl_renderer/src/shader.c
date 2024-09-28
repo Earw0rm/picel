@@ -1,11 +1,11 @@
 #include "shader.h"
-#include "utils.h"
+#include "math.h"
 #include "logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
+#include <stdbool.h>
 #define INFO_BUFSZ 0x1000
 
 
@@ -106,8 +106,8 @@ create_shader_and_compile(GLenum shader_type, const int32_t shader_data_sz, cons
 int8_t 
 shader_init(const char* vert_path, const char* frag_path, shader* sp){
     int8_t res = SHADER_STATUS_OK;
-    sp->frag_shader_id = 0;
-    sp->vert_shader_id = 0;
+    GLint frag_shader_id = 0;
+    GLint vert_shader_id = 0;
     sp->program = 0;
 
     int64_t vert_shader_res;
@@ -115,40 +115,41 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
     int64_t frag_shader_res;
     const char* frag_shader_data = nullptr;
     GLint link_res;
-
+    GLint val_res;
     if((vert_shader_res = shader_read(vert_path, &vert_shader_data)) < 0){
+        LOG_ERROR("cannot read vertex_shader: %i", vert_shader_res);
         res = vert_shader_res;
         goto shader_cleanup;
     }
     if((frag_shader_res = shader_read(frag_path, &frag_shader_data)) < 0){
+        LOG_ERROR("cannot read fragment_shader: %i", vert_shader_res);
         res = frag_shader_res;
         goto shader_cleanup;
     }
 
-    sp->vert_shader_id = 
+    vert_shader_id = 
                 create_shader_and_compile(GL_VERTEX_SHADER, vert_shader_res, vert_shader_data);
 
-    if(sp->vert_shader_id <= 0){
-        res = sp->vert_shader_id;
+    if(vert_shader_id <= 0){
+        res = vert_shader_id;
         goto shader_cleanup;
     }
 
-    sp->frag_shader_id = 
-                create_shader_and_compile(GL_FRAGMENT_SHADER, frag_shader_res, frag_shader_data);    
-
-    if(sp->frag_shader_id <= 0){
-        res = sp->frag_shader_id;
+    frag_shader_id = create_shader_and_compile(GL_FRAGMENT_SHADER, frag_shader_res, frag_shader_data);    
+    if(frag_shader_id <= 0){
+        res = frag_shader_id;
         goto shader_cleanup;
     }
 
     sp->program = glCreateProgram();
     if(sp->program == 0){
+        LOG_ERROR("cannot create program: %i", sp->program);
         res = SHADER_STATUS_BAD_PROGRAM_CREATE;
         goto shader_cleanup;
     }
 
-    glAttachShader(sp->program, sp->vert_shader_id);
-    glAttachShader(sp->program, sp->frag_shader_id);
+    glAttachShader(sp->program, vert_shader_id);
+    glAttachShader(sp->program, frag_shader_id);
 
     glLinkProgram(sp->program);
     glGetProgramiv(sp->program, GL_LINK_STATUS, &link_res);
@@ -160,12 +161,34 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
         goto shader_cleanup;
     } 
 
-shader_cleanup:
-    if(sp->vert_shader_id > 0){
-            glDeleteShader(sp->vert_shader_id);
+    // this validations check that program 
+    // compatable with current opengl runtime
+    glValidateProgram(sp->program);
+    glGetProgramiv(sp->program, GL_VALIDATE_STATUS, &val_res);
+    if(!val_res){
+        char buf[INFO_BUFSZ];
+        glGetProgramInfoLog(sp->program, INFO_BUFSZ, nullptr, buf);
+        LOG_FATAL("Validation of shader programm failed: %s", buf);
+        res = SHADER_STATUS_BAD_PROGRAM_VALIDATION;
+        goto shader_cleanup;
+    }    
+
+    //uniform need to be called after program link
+    sp->mvp_loc = glGetUniformLocation(sp->program, "mvp");
+    if(sp->mvp_loc == -1){
+        LOG_FATAL("cannot get uniform with name mvp");
+        res = SHADER_STATUS_BAD_MVP_UNIFORM;
+        goto shader_cleanup;
     }
-    if(sp->frag_shader_id > 0){
-            glDeleteShader(sp->frag_shader_id);
+
+    sp->is_initialized = true;
+
+shader_cleanup:
+    if(vert_shader_id > 0){
+            glDeleteShader(vert_shader_id);
+    }
+    if(frag_shader_id > 0){
+            glDeleteShader(frag_shader_id);
     }
     if(vert_shader_data != nullptr){
         free((void*) vert_shader_data);
@@ -184,15 +207,20 @@ shader_cleanup:
 }
 
 void shader_shutdown(shader* sp){
-    glDeleteShader(sp->frag_shader_id);
-    glDeleteShader(sp->vert_shader_id);    
+    glDeleteProgram(sp->program);
+    sp->is_initialized = false;
+    sp->program =  0;
+    sp->mvp_loc = -1;
 }
 
-void shader_use(shader* sp){
-    LOG_DEBUG("Use shader with program_id: %i, vertex_shader: %i, fragment_shader: %i",
-              sp->program,
-              sp->vert_shader_id, 
-              sp->frag_shader_id);
+uint8_t shader_use(shader* sp){
+    if(!sp->is_initialized){
+        return SHADER_STATUS_BAD_IS_UNINITIALIZED;
+    }
+
+    LOG_DEBUG("Use shader with program_id: %i", sp->program);   
+
 
     glUseProgram(sp->program);
+    return SHADER_STATUS_OK;
 }

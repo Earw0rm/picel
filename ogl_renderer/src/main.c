@@ -1,24 +1,32 @@
-#include "logger.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+
 #include "window.h"
+#include "math.h"
 
 #include "shader.h"
-#include <stdio.h>
-
-
+#include <stdlib.h>
 
 int main(int argc, char const *argv[])
-{
-    if(win_init("my first c window", 1024, 1024)){
-        return -1;
-    }
+{       uint8_t win_init_res;
+        if((win_init_res = win_init("asd", 1024, 1024)) != SHADER_STATUS_OK){
+            return win_init_res;
+        }
+
+        int8_t shader_res;
+        shader basic_shader;
+        if((shader_res = shader_init("./shaders/basic.vert", "./shaders/basic.frag", &basic_shader)) != SHADER_STATUS_OK){
+            exit(shader_res);
+ 
+        }
+
+        if((shader_res = shader_use(&basic_shader)) != SHADER_STATUS_OK){
+            exit(shader_res);
+        }
 
 
-    int8_t shader_init_res;
-    shader basic_shader;
-    if((shader_init_res = shader_init("./shaders/basic.vert", "./shaders/basic.frag", &basic_shader)) != 0){
-        return shader_init_res;
-    }
-    shader_use(&basic_shader);
+
 
 
         GLuint vbo, vao, ebo;
@@ -27,42 +35,26 @@ int main(int argc, char const *argv[])
 
 
 
-        float cube[8 * 7] = {
+        float cube[3 * 7] = {
             /*vertice coordinat*/              /*vertex color*/ 
-            /*0*/-1.0f, 1.0f,-1.0f,            1.0f, 0.0f, 1.0f, 1.0f,
-            /*1*/ 1.0f, 1.0f,-1.0f,            0.5f, 0.5f, 0.0f, 1.0f,
-            /*2*/ 1.0f, 1.0f, 1.0f,            0.0f, 1.0f, 0.0f, 1.0f,
-            /*3*/-1.0f, 1.0f, 1.0f,            0.0f, 0.5f, 0.5f, 1.0f,
-            /*4*/-1.0f,-1.0f,-1.0f,            0.0f, 0.0f, 0.1f, 1.0f,
-            /*5*/ 1.0f,-1.0f,-1.0f,            0.5f, 0.0f, 0.5f, 1.0f,
-            /*6*/ 1.0f,-1.0f, 1.0f,            0.5f, 0.5f, 0.5f, 1.0f,
-            /*7*/-1.0f,-1.0f, 1.0f,            1.0f, 1.0f, 1.0f, 1.0f,                                                                                    
+            /*0*/ 0.0f, 0.0f, 0.0f,            1.0f, 0.0f, 1.0f, 1.0f,
+            /*1*/ 0.5f, -0.5f, 1.0f,            0.0f, 1.0f, 0.0f, 1.0f,
+            /*2*/-0.5f,-0.5f, 0.0f,            0.5f, 0.5f, 0.0f, 1.0f                                              
         };
-        [[gnu::unused]]GLuint indices[12 * 3] ={
-            0, 1, 3, 
-            1, 2, 3,
-            0, 4, 1,
-            1, 4, 5,
-            0, 3, 7,
-            0, 7, 4,
-            1, 6, 2,
-            1, 5, 6,
-            2, 7, 3,
-            2, 6, 7,
-            4, 7, 5,
-            5, 7, 6                                                                                                             
+        [[gnu::unused]]GLuint indices[1 * 3] ={
+            0, 1, 2                                                                                                           
         };
 
 
         glGenBuffers(1, &ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);    
         // load data from memory to GPU
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof(GLuint), indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 1 * 3 * sizeof(GLuint), indices, GL_STATIC_DRAW);
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);    
         // load data from memory to GPU
-        glBufferData(GL_ARRAY_BUFFER, 8 * 7* sizeof(float), cube, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 3 * 7* sizeof(float), cube, GL_STATIC_DRAW);
 
 
         
@@ -90,15 +82,35 @@ int main(int argc, char const *argv[])
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 
+        bool translate_right = true;
+        float how_much = 0.01f;
+        while(!win_should_close()){
 
-    while(!win_should_close()){
-        glClear(GL_COLOR_BUFFER_BIT );
-        glDrawElements(GL_TRIANGLES, 12 * 3, GL_UNSIGNED_INT, 0);
+            matrix4f mvp = mat4f_id(1);
+            mvp = mat4f_translate(mvp, how_much, 0.0f, 0.0f);
+            if(translate_right){
+                how_much += 0.01f;
+                if(how_much >= 1){
+                    translate_right = false;
+                }
+            }else{
+                how_much -= 0.01f;
+                if(how_much <= -1){
+                    translate_right = true;
+                }
+            }
 
-        win_swap_buffers();
-        win_poll_events();
-    }
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glUniformMatrix4fv(basic_shader.mvp_loc, 1, GL_FALSE, mvp.m);
+            // for data withou ebo
+            // glDrawArrays(GL_TRIANGLES, 0, vert_count);
+            // for data with ebo
+            glDrawElements(GL_TRIANGLES, 1 * 3, GL_UNSIGNED_INT, 0);
 
-    win_destroy();
-    return 0;
+
+            win_swap_buffers();
+            win_poll_events();
+        }
+        glBindVertexArray(0);
+        exit(EXIT_SUCCESS);
 }

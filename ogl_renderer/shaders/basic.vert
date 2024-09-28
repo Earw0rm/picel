@@ -15,15 +15,13 @@ layout (location = 1) in vec4 inColors;
 // d - double
 // b - bool 
 // N - 1, 2, 3, 4 (vector size)
-// uniform mat4 MVP;
+uniform mat4 mvp;
 out vec4 vertexColor;
 
 
 
 void main(){
 
-
-    gl_Position = vec4(inPos.x, inPos.y, inPos.z, 1.0f);
+    gl_Position = mvp * vec4(inPos.x, inPos.y, inPos.z, 1.0f);
     vertexColor = inColors;       
 }
-
