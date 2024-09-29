@@ -4,7 +4,7 @@ COMPILER ?= clang
 LIBS_SRC = ./libs
 OPS = -g -Wvarargs -Wall -Werror -std=c23
 INCLUDE_FLAGS = -I./include -I./libs/include
-LINKER_FLAGS = -lc -lglfw -lGL -ldl -lpthread -lX11 -lXrandr -lXi
+LINKER_FLAGS = -lm -lc -lglfw -lGL -ldl -lpthread -lX11 -lXrandr -lXi
 OUT = renderer
 
 SRC_C_FILES = $(shell find $(SOURCE_DIR) -name '*.c')

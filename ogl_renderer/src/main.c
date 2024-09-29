@@ -34,12 +34,11 @@ int main(int argc, char const *argv[])
         glBindVertexArray(vao);
 
 
-
         float cube[3 * 7] = {
             /*vertice coordinat*/              /*vertex color*/ 
-            /*0*/ 0.0f, 0.0f, 0.0f,            1.0f, 0.0f, 1.0f, 1.0f,
-            /*1*/ 0.5f, -0.5f, 1.0f,            0.0f, 1.0f, 0.0f, 1.0f,
-            /*2*/-0.5f,-0.5f, 0.0f,            0.5f, 0.5f, 0.0f, 1.0f                                              
+            /*0*/ 0.0f, 0.0f, 0.0f,            1.0f, 0.0f, 0.0f, 1.0f,
+            /*1*/ 0.5f, -0.5f, 1.0f,           0.0f, 1.0f, 0.0f, 1.0f,
+            /*2*/-0.5f,-0.5f, 0.0f,            0.0f, 0.0f, 1.0f, 1.0f                                              
         };
         [[gnu::unused]]GLuint indices[1 * 3] ={
             0, 1, 2                                                                                                           
@@ -82,31 +81,22 @@ int main(int argc, char const *argv[])
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 
-        bool translate_right = true;
-        float how_much = 0.01f;
+
+
+
         while(!win_should_close()){
 
             matrix4f mvp = mat4f_id(1);
-            mvp = mat4f_translate(mvp, how_much, 0.0f, 0.0f);
-            if(translate_right){
-                how_much += 0.01f;
-                if(how_much >= 1){
-                    translate_right = false;
-                }
-            }else{
-                how_much -= 0.01f;
-                if(how_much <= -1){
-                    translate_right = true;
-                }
-            }
+            mvp = mat4f_scale(mvp, 2, 2, 0);
+
+
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUniformMatrix4fv(basic_shader.mvp_loc, 1, GL_FALSE, mvp.m);
             // for data withou ebo
             // glDrawArrays(GL_TRIANGLES, 0, vert_count);
             // for data with ebo
-            glDrawElements(GL_TRIANGLES, 1 * 3, GL_UNSIGNED_INT, 0);
-
+            glDrawElements(GL_TRIANGLES, 1 * 3, GL_UNSIGNED_INT, 0 /*last parameter deprecated*/);
 
             win_swap_buffers();
             win_poll_events();

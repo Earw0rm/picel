@@ -1,7 +1,7 @@
 #version 330 core
 // declarations of input attributes in shader
 // we choose hire index of vertex attributes
-layout (location = 0) in vec3 inPos;
+layout (location = 0) in vec3 in_pos;
 layout (location = 1) in vec4 inColors;
 
 //https://en.wikibooks.org/wiki/GLSL_Programming/Vector_and_Matrix_Operations
@@ -22,6 +22,6 @@ out vec4 vertexColor;
 
 void main(){
 
-    gl_Position = mvp * vec4(inPos.x, inPos.y, inPos.z, 1.0f);
+    gl_Position = mvp * vec4(in_pos, 1.0f);
     vertexColor = inColors;       
 }

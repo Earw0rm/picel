@@ -3,7 +3,8 @@
         "stdint.h": "c",
         "stdbool.h": "c",
         "stdarg.h": "c",
-        "__config": "c"
+        "__config": "c",
+        "math.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
