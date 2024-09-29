@@ -1,8 +1,9 @@
 #include "mesh.h"
 #include <glad/glad.h>
+#include <stddef.h>
 
-static size_t number_of_meshes_used    = 0;
-static size_t number_of_meshes_created = 0;
+[[gnu::unused]]static size_t number_of_meshes_used    = 0;
+[[gnu::unused]]static size_t number_of_meshes_created = 0;
 
 struct mesh_data{
     GLint vbo;
@@ -10,10 +11,10 @@ struct mesh_data{
     GLint ebo;
 
     uint64_t vertices_num;
-    float vertices*;
+    float* vertices;
 
     uint64_t indexes_num;
-    uint64_t indexes*;
+    uint64_t* indexes;
 };
 
 mesh createMesh(const char* filepath){

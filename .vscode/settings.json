@@ -4,7 +4,8 @@
         "stdbool.h": "c",
         "stdarg.h": "c",
         "__config": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "glad.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
