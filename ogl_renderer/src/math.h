@@ -107,19 +107,21 @@ mdotv4(matrix4f m, vector4f v){
     return ret;
 }   
 
-static inline matrix4f 
-mdotm4(matrix4f l, matrix4f r){
+static inline matrix4f
+mdotm4(matrix4f l, matrix4f r) {
     matrix4f res;
-    for (int col = 0; col < 4; ++col) {
-        for (int row = 0; row < 4; ++row) {
-            res.m[col * 4 + row] = l.m[0 * 4 + row] * r.m[col * 4 + 0]
-                                 + l.m[1 * 4 + row] * r.m[col * 4 + 1]
-                                 + l.m[2 * 4 + row] * r.m[col * 4 + 2]
-                                 + l.m[3 * 4 + row] * r.m[col * 4 + 3];
+    for (int row = 0; row < 4; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            res.m[col * 4 + row] = 
+                l.m[0 * 4 + row] * r.m[col * 4 + 0] +
+                l.m[1 * 4 + row] * r.m[col * 4 + 1] +
+                l.m[2 * 4 + row] * r.m[col * 4 + 2] +
+                l.m[3 * 4 + row] * r.m[col * 4 + 3];
         }
     }
     return res;
 }
+
 
 static inline matrix4f
 mat4f_transpose(matrix4f m){
@@ -220,6 +222,32 @@ mat4f_translate(matrix4f m, float x, float y, float z){
    );
 }
 
+static inline matrix4f
+mat4f_tmp_projection(float hfov, float ar, float nearz, float farz) {
 
+    float tanHalfFOV = tanf(DEGREE2RADIANS(hfov / 2));
+    float f = 1.0f / tanHalfFOV;
+    float val_33 = -(farz + nearz) / (farz - nearz );
+    float val_43 = -(2 * farz * nearz) / (farz - nearz );
+
+    matrix4f res = {
+        (f / ar), 0,     0,      0,
+        0,        f,     0,      0,
+        0,        0,     val_33, -1,
+        0,        0,     val_43,  0
+    };
+
+    return res;
+}
+
+// angle in radians 
+static inline matrix4f
+mat4f_project(matrix4f m, float hfov, float aspect_ratio, float nearz, float farz){
+    
+    matrix4f res = mdotm4(mat4f_tmp_projection(hfov, aspect_ratio, nearz, farz), m); 
+
+    return res;
+    
+}
 
 #endif 

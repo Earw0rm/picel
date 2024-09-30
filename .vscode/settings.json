@@ -5,7 +5,8 @@
         "stdarg.h": "c",
         "__config": "c",
         "math.h": "c",
-        "glad.h": "c"
+        "glad.h": "c",
+        "call.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

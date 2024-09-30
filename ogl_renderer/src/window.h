@@ -24,5 +24,5 @@ void win_destroy();
 void win_poll_events();
 void win_swap_buffers();
 bool win_should_close();
-
+float win_get_aspect_ratio();
 #endif 

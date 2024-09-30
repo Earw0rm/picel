@@ -51,7 +51,7 @@ win_init(const char* title, uint32_t height, uint32_t width){
          return BAD_GLAD_LOAD;
     }
 
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
@@ -59,7 +59,8 @@ win_init(const char* title, uint32_t height, uint32_t width){
 
     glfwSetFramebufferSizeCallback(win.window, resize_callback);
     glfwSetKeyCallback(win.window, key_input_callback);
-    
+    win.height = height;
+    win.width  = width;
     win.is_initialized = true;
     LOG_INFO("Window initialized");
     return OK;
@@ -103,4 +104,9 @@ win_poll_events(){
         return;
     }
     glfwPollEvents();
+}
+
+float
+win_get_aspect_ratio(){
+    return (((float) win.width) / ((float)win.height));
 }
