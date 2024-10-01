@@ -92,7 +92,7 @@ int test4(){
 
     bool all_eq = true;
     for(float i = 0.0f; (int)i < test_arr_sz; i += 1.0f){
-        float* elem = (float*)dqeue_pop_front(dq);
+        float* elem = (float*)dqueue_pop_front(dq);
         if(test_arr[(int)i] != *elem){
             LOG_ERROR("MPT %f = %f", test_arr[(int)i], *elem);
             all_eq = false;
@@ -101,9 +101,54 @@ int test4(){
     ASSERT(all_eq == true, "element in deq need to be in correct push order");
     return 1;
 }
-int test5(){
 
-    return 0;
+int test5(){
+    dqueue dq = dqueue_alloc(int);
+
+    bool all_eq = true;
+    for(int i = 0; i < 1998; ++i){
+        dqueue_push_back(dq, i);
+        int* ii  = (int*)dqueue_pop_front(dq);
+        int* ii2 = (int*)dqueue_pop_front(dq);
+
+        if(ii2 != nullptr){
+            all_eq = false;
+            LOG_ERROR("Ptr is broken, i = %i", i);
+        }
+        if(*ii != i){
+            all_eq = false;
+            LOG_ERROR("Value is broken, i = %i, *ii = %i", i, *ii);
+        }
+    }
+    uint64_t capacity = dqueue_capacity(dq);
+    ASSERT(all_eq, "second pop after push should return nullptr");
+    ASSERT(capacity == 2, "capacity need to be 2 in this case");
+    return 1;
+}
+int test6(){
+    dqueue dq = dqueue_alloc(int);
+    dqueue_push_back(dq, 1);
+    dqueue_push_back(dq, 1);
+    dqueue_push_back(dq, 1);
+    int* i1  = (int*)dqueue_pop_front(dq);
+    int* i2  = (int*)dqueue_pop_front(dq);
+    int* i3  = (int*)dqueue_pop_front(dq);
+    dqueue_push_back(dq, 1);
+    dqueue_push_back(dq, 1);
+    dqueue_push_back(dq, 1);
+    int* i11  = (int*)dqueue_pop_front(dq);
+    int* i12  = (int*)dqueue_pop_front(dq);
+    int* i13  = (int*)dqueue_pop_front(dq);
+
+    uint64_t capacity = dqueue_capacity(dq);
+    uint64_t lenght = dqueue_lenght(dq);
+
+    ASSERT(capacity == 4, "capacity should not increase when we use push/pop sequentialy");
+    ASSERT(lenght   == 0, "after 3 push and 3pop lenght should be 0");
+    ASSERT(i1 == i11, "addreses of values in dqueue should be same when we use push/pop sequentialy");
+    ASSERT(i2 == i12, "addreses of values in dqueue should be same when we use push/pop sequentialy");
+    ASSERT(i3 == i13, "addreses of values in dqueue should be same when we use push/pop sequentialy");
+    return 1;
 }
 int main(int argc, char const *argv[])
 {
@@ -112,5 +157,6 @@ int main(int argc, char const *argv[])
     TEST("basic push/pop test", test3);
     TEST("massive push test", test4);
     TEST("massive push/pop test", test5);
+    TEST("capacity and adresses test", test6);
     return 0;
 }

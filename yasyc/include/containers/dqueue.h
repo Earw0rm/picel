@@ -12,7 +12,7 @@ typedef struct dqueue_intr* dqueue;
 
 dqueue _dqueue_alloc(uint64_t stride);
 void dqueue_free(dqueue dq);
-void* dqeue_pop_front(dqueue dq);
+void* dqueue_pop_front(dqueue dq);
 void _dqueue_push_back(dqueue dq, void* elem);
 void dqueue_scale(dqueue dq);
 

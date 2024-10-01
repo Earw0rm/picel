@@ -60,8 +60,8 @@ void dqueue_free(dqueue dq){
     free(dq);
 }
 
-void* dqeue_pop_front(dqueue dq){
-    if(dq->header.lenght == dq->header.capacity) return nullptr;
+void* dqueue_pop_front(dqueue dq){
+    if(dq->header.lenght == 0) return nullptr;
     void* val = &dq->values[dq->header.head_idx * dq->header.stride];
     dq->header.head_idx += 1;
     dq->header.lenght   -= 1;   
