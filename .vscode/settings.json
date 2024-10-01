@@ -31,7 +31,8 @@
         "string": "c",
         "dqueue.h": "c",
         "ranges": "c",
-        "valarray": "c"
+        "valarray": "c",
+        "stacktrace": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

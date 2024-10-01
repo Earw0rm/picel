@@ -16,10 +16,6 @@ void* dqeue_pop_front(dqueue dq);
 void _dqueue_push_back(dqueue dq, void* elem);
 void dqueue_scale(dqueue dq);
 
-
-
-
-
 uint64_t dqueue_stride(dqueue dq);
 uint64_t dqueue_lenght(dqueue dq);
 uint64_t dqueue_capacity(dqueue dq);

@@ -16,6 +16,6 @@
     LOG_INFO("Running test: %s", description); \
     if(body()) {                               \
         LOG_INFO("Passed");                    \
-    } else LOG_ERROR("Error");                 \
+    } else LOG_ERROR("%s failed.", description);                 \
 } while(0)
 #endif 

@@ -79,12 +79,38 @@ int test3(){
 
     return 1;
 }
+int test4(){
+    const int test_arr_sz = 1000;
+    float test_arr[test_arr_sz];
+ 
+    dqueue dq = dqueue_alloc(float);
 
+    for(float i = 0.0f; (int)i < test_arr_sz; i += 1.0f){
+        test_arr[(int)i] = i;
+        dqueue_push_back(dq, i);
+    }
+
+    bool all_eq = true;
+    for(float i = 0.0f; (int)i < test_arr_sz; i += 1.0f){
+        float* elem = (float*)dqeue_pop_front(dq);
+        if(test_arr[(int)i] != *elem){
+            LOG_ERROR("MPT %f = %f", test_arr[(int)i], *elem);
+            all_eq = false;
+        }
+    }
+    ASSERT(all_eq == true, "element in deq need to be in correct push order");
+    return 1;
+}
+int test5(){
+
+    return 0;
+}
 int main(int argc, char const *argv[])
 {
     TEST("basic alloc/free test", test1);
     TEST("basic capasity/scale test", test2);
     TEST("basic push/pop test", test3);
-
+    TEST("massive push test", test4);
+    TEST("massive push/pop test", test5);
     return 0;
 }
