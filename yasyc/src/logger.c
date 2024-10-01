@@ -5,8 +5,8 @@
 
 static const char* lvl2str[6] = {
     [LOG_LEVEL_FATAL] = "\033[0;41m[FATAL]: ",
-    [LOG_LEVEL_ERROR] = "\033[1;33m[ERROR]: ",
-    [LOG_LEVEL_WARN]  = "\033[1;33m[WARN]: " ,
+    [LOG_LEVEL_ERROR] = "\033[0;33m[ERROR]: ",
+    [LOG_LEVEL_WARN]  = "\033[1:33m[WARN]: " ,
     [LOG_LEVEL_INFO]  = "\033[1;32m[INFO]: " ,
     [LOG_LEVEL_DEBUG] = "\033[1;34m[DEBUG]: ",
     [LOG_LEVEL_TRACE] = "\033[1;30m[TRACE]: ",

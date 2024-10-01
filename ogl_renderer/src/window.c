@@ -1,6 +1,7 @@
 #include "window.h"
 #include "logger.h"
 #include <stdlib.h>
+#include "uvn_camera.h"
 
 static struct window{
     const char* title;
@@ -8,6 +9,7 @@ static struct window{
     uint32_t width;
     GLFWwindow* window;
     bool is_initialized;
+    camera main_camera;
 } win;
 
 static void 
@@ -22,6 +24,22 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
 
     if(key == GLFW_KEY_ESCAPE){
         glfwSetWindowShouldClose(window, true);
+    }else if(key == GLFW_KEY_W){
+        if(action == 1 || action == 2){
+            camera_move(win.main_camera, 0.0, 0.0, 1.0);
+        }
+    }else if(key == GLFW_KEY_S){
+        if(action == 1 || action == 2){
+            camera_move(win.main_camera, 0.0, 0.0, -1.0);
+        }
+    }else if(key == GLFW_KEY_A){
+        if(action == 1 || action == 2){
+            camera_move(win.main_camera, 1.0, 0.0, 0.0);
+        }
+    }else if(key == GLFW_KEY_D){
+        if(action == 1 || action == 2){
+            camera_move(win.main_camera, -1.0, 0.0, 0.0);
+        }
     }
 }
 
@@ -61,6 +79,9 @@ win_init(const char* title, uint32_t height, uint32_t width){
     glfwSetKeyCallback(win.window, key_input_callback);
     win.height = height;
     win.width  = width;
+    // TODO CRUNCH
+    win.main_camera = camera_init();
+
     win.is_initialized = true;
     LOG_INFO("Window initialized");
     return OK;
@@ -76,6 +97,7 @@ win_destroy(){
         LOG_DEBUG("cannot destroy not initialized window");
         return;        
     }
+    camera_destroy(win.main_camera);
     glfwDestroyWindow(win.window);
     glfwTerminate();
 }
@@ -109,4 +131,7 @@ win_poll_events(){
 float
 win_get_aspect_ratio(){
     return (((float) win.width) / ((float)win.height));
+}
+matrix4f win_get_view(){
+    return camera_get_data(win.main_camera);
 }

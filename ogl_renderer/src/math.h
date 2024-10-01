@@ -2,33 +2,12 @@
 #define _MATH_H_
 #include <math.h>
 #include "logger.h"
+#include "math_struct.h"
+
 #define PI 3.14159265f
 #define RADIANS2DEGREE(rad) (rad * (180.0f / PI))
 #define DEGREE2RADIANS(deg) ((deg) * PI / 180.0f)
 
-/**
- * Column-major (matrix &| vector) operations
-*/
-typedef struct vector2f{
-    float x;
-    float y;
-}vector2f;
-
-typedef struct vector3f{
-    float x;
-    float y;
-    float z;
-}vector3f;
-
-typedef struct vector4f{
-    float x;
-    float y;
-    float z;
-    float w;
-}vector4f;
-
-typedef struct matrix4f { float m[16]; } matrix4f;
-typedef struct matrix3f { float m[12]; } matrix3f;
 
 static inline void 
 log_matrix(matrix4f m){
@@ -223,7 +202,7 @@ mat4f_translate(matrix4f m, float x, float y, float z){
 }
 
 static inline matrix4f
-mat4f_tmp_projection(float hfov, float ar, float nearz, float farz) {
+mat4f_projection(float hfov, float ar, float nearz, float farz) {
 
     float tanHalfFOV = tanf(DEGREE2RADIANS(hfov / 2));
     float f = 1.0f / tanHalfFOV;
@@ -240,14 +219,16 @@ mat4f_tmp_projection(float hfov, float ar, float nearz, float farz) {
     return res;
 }
 
-// angle in radians 
+// angle in degree 
 static inline matrix4f
 mat4f_project(matrix4f m, float hfov, float aspect_ratio, float nearz, float farz){
     
-    matrix4f res = mdotm4(mat4f_tmp_projection(hfov, aspect_ratio, nearz, farz), m); 
+    matrix4f res = mdotm4(mat4f_projection(hfov, aspect_ratio, nearz, farz), m); 
 
     return res;
     
 }
+
+
 
 #endif 

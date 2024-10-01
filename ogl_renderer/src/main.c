@@ -9,6 +9,8 @@
 
 #include "shader.h"
 #include <stdlib.h>
+#include "uvn_camera.h"
+
 
 int main(int argc, char const *argv[])
 {       uint8_t win_init_res;
@@ -98,24 +100,28 @@ int main(int argc, char const *argv[])
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+
+
+
         [[gnu::unused]]float aspect_ratio = win_get_aspect_ratio();
-
-
         [[gnu::unused]]float degree = 0.0f;
         while(!win_should_close()){
+
+
 
             matrix4f mvp = mat4f_id(1);
             mvp = mat4f_scale(mvp, 0.5f, 0.5f, 0.5f);
             mvp = mat4f_rotate(mvp, 0.0, 0.0, degree);
             mvp = mat4f_translate(mvp, 1.0, 0.0f, -3.0f);      
+            
+            mvp = mdotm4(win_get_view(), mvp);
+
             mvp = mat4f_project(mvp, 90.0f, aspect_ratio, 1, 100);
 
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUniformMatrix4fv(basic_shader.mvp_loc, 1, GL_FALSE, mvp.m);
-            // for data withou ebo
-            // glDrawArrays(GL_TRIANGLES, 0, vert_count);
-            // for data with ebo
             glDrawElements(GL_TRIANGLES, 12 * 3, GL_UNSIGNED_INT, 0 /*last parameter deprecated*/);
 
 
