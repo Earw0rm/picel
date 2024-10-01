@@ -29,7 +29,9 @@
         "rope": "c",
         "__split_buffer": "c",
         "string": "c",
-        "dqueue.h": "c"
+        "dqueue.h": "c",
+        "ranges": "c",
+        "valarray": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

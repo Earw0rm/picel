@@ -19,25 +19,21 @@ struct dqueue_intr{
     void* values;
 };
 
-dqueue  _dqueue_scale(dqueue dq){
+void dqueue_scale(dqueue dq){
     uint64_t new_capacity = dq->header.capacity * SCALE_FACTOR ;
     uint64_t new_lenght = dq->header.lenght - dq->header.head_idx;
 
-    dqueue new_dq = malloc(sizeof(struct dqueue_intr));
-    new_dq->values = malloc(new_capacity * dq->header.stride);
-
-
-    new_dq->header.capacity = new_capacity;
-    new_dq->header.lenght   = new_lenght;
-    new_dq->header.stride   = dq->header.stride;
-    new_dq->header.head_idx = 0;
-
-    memcpy(new_dq->values,
-           &dq->values[dq->header.head_idx * dq->header.stride],
+    void* old_values = dq->values;
+    void* new_values = malloc(new_capacity * dq->header.stride);
+    memcpy(new_values,
+           &old_values[dq->header.head_idx * dq->header.stride],
            new_lenght * dq->header.stride);
-
-    _dqueue_free(dq);
-    return new_dq;
+    
+    dq->values = new_values;
+    dq->header.capacity = new_capacity;
+    dq->header.lenght   = new_lenght;
+    dq->header.head_idx = 0;
+    free(old_values);
 }
 
 dqueue _dqueue_alloc(uint64_t stride){
@@ -51,21 +47,20 @@ dqueue _dqueue_alloc(uint64_t stride){
     return dq;
 }
 
-dqueue _dqueue_push_back(dqueue dq, void* elem){
+void _dqueue_push_back(dqueue dq, void* elem){
     if(dq->header.lenght == dq->header.capacity){
-        dq = _dqueue_scale(dq);
+        dqueue_scale(dq);
     }
     memcpy(&dq->values[dq->header.lenght * dq->header.stride], elem, dq->header.stride);
     dq->header.lenght += 1;
-    return dq;
 }
 
-void _dqueue_free(dqueue dq){
+void dqueue_free(dqueue dq){
     free(dq->values);
     free(dq);
 }
 
-void* _dqeue_pop_front(dqueue dq){
+void* dqeue_pop_front(dqueue dq){
     if(dq->header.lenght == dq->header.capacity) return nullptr;
     void* val = &dq->values[dq->header.head_idx * dq->header.stride];
     dq->header.head_idx += 1;
