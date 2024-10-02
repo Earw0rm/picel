@@ -132,6 +132,8 @@ win_poll_events(){
         return;
     }
     glfwPollEvents();
+    // TODO also hire we need to check LIVE_KEYS
+    // win_process_camera_move now
 }
 
 float

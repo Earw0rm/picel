@@ -98,10 +98,14 @@ bool event_system_register(event_code code, void* listener, on_event_pfn on_even
 bool event_system_unregister(event_code code, void* listener, on_event_pfn on_event);
 
 
-// TODO fire is not a good name
+
 /**
+ * 
  * Fires an event to listeners of the given type. If an event handler returns TRUE,
  * the event is considered handled and is not passed on to any more listeners
+ * 
+ * TODO functional above does not implemented now (mean boolean choice);
+ * TODO fire is not a good name
  * @param code the event type to fire
  * @param sender a pointer to sender. Can be nullptr
  * @param context event context 
