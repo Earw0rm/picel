@@ -1,19 +1,27 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
-#include <cglm/cglm.h>   /* for inline */
-#include <cglm/call.h>   /* for library call (this also includes cglm.h) */
+
+
 
 #include "window.h"
 #include "math.h"
+#include "event_system.h"
 
 #include "shader.h"
-#include <stdlib.h>
 #include "uvn_camera.h"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <stdlib.h>
 
-int main(int argc, char const *argv[])
-{       uint8_t win_init_res;
+// #include <cglm/cglm.h>   /* for inline */
+// #include <cglm/call.h>   /* for library call (this also includes cglm.h) */
+
+int main(int argc, char const *argv[]){
+    
+        event_system_init();
+
+
+        uint8_t win_init_res;
         if((win_init_res = win_init("asd", 1024, 2048)) != SHADER_STATUS_OK){
             return win_init_res;
         }
