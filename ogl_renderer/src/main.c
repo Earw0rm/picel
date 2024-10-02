@@ -107,15 +107,16 @@ int main(int argc, char const *argv[])
         [[gnu::unused]]float aspect_ratio = win_get_aspect_ratio();
         [[gnu::unused]]float degree = 0.0f;
         while(!win_should_close()){
-
-
+            // TODO boolsheet
+            win_process_camera_move();
+            matrix4f view = win_get_view();
 
             matrix4f mvp = mat4f_id(1);
             mvp = mat4f_scale(mvp, 0.5f, 0.5f, 0.5f);
             mvp = mat4f_rotate(mvp, 0.0, 0.0, degree);
             mvp = mat4f_translate(mvp, 1.0, 0.0f, -3.0f);      
-            
-            mvp = mdotm4(win_get_view(), mvp);
+
+            mvp = mdotm4(view, mvp);
 
             mvp = mat4f_project(mvp, 90.0f, aspect_ratio, 1, 100);
 

@@ -2,9 +2,12 @@ BUILD_DIR = ./build
 SOURCE_DIR = ./src
 COMPILER ?= clang
 LIBS_SRC = ./libs
+YASYC_PATH =../yasyc/
+
 OPS = -g -Wvarargs -Wall -Werror -std=c23
-INCLUDE_FLAGS = -I./include -I./libs/include
-LINKER_FLAGS = -lm -lc -lglfw -lGL -ldl -lpthread -lX11 -lXrandr -lXi
+INCLUDE_FLAGS = -I./include -I./libs/include -I../yasyc/include
+LINKER_FLAGS = -L$(YASYC_PATH) -Wl,-rpath,$(YASYC_PATH)  -lm -lc -lglfw -lGL -ldl -lpthread -lX11 -lXrandr -lXi -lyasyc 
+
 OUT = renderer
 
 SRC_C_FILES = $(shell find $(SOURCE_DIR) -name '*.c')

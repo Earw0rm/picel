@@ -3,6 +3,8 @@
 #include <string.h>
 #include "logger.h"
 
+
+
 #define BASIC_CAPACITY 2
 #define SCALE_FACTOR 2
 

@@ -30,4 +30,5 @@ float win_get_aspect_ratio();
 
 //TODO CRUNCH
 matrix4f win_get_view();
+void win_process_camera_move();
 #endif 

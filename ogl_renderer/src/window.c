@@ -24,25 +24,31 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
 
     if(key == GLFW_KEY_ESCAPE){
         glfwSetWindowShouldClose(window, true);
-    }else if(key == GLFW_KEY_W){
-        if(action == 1 || action == 2){
-            camera_move(win.main_camera, 0.0, 0.0, 1.0);
-        }
-    }else if(key == GLFW_KEY_S){
-        if(action == 1 || action == 2){
-            camera_move(win.main_camera, 0.0, 0.0, -1.0);
-        }
-    }else if(key == GLFW_KEY_A){
-        if(action == 1 || action == 2){
-            camera_move(win.main_camera, 1.0, 0.0, 0.0);
-        }
-    }else if(key == GLFW_KEY_D){
-        if(action == 1 || action == 2){
-            camera_move(win.main_camera, -1.0, 0.0, 0.0);
-        }
     }
 }
 
+
+// TODO tmp
+void 
+win_process_camera_move(){
+    uint32_t key_w = glfwGetKey(win.window, GLFW_KEY_W);
+    uint32_t key_s = glfwGetKey(win.window, GLFW_KEY_S);
+    uint32_t key_a = glfwGetKey(win.window, GLFW_KEY_A);
+    uint32_t key_d = glfwGetKey(win.window, GLFW_KEY_D);
+
+    if(key_w == GLFW_PRESS){
+        camera_move(win.main_camera, 0.0, -0.1, 0.0);
+    }
+    if(key_s == GLFW_PRESS){
+        camera_move(win.main_camera, 0.0, 0.1, 0.0);
+    }
+    if(key_a == GLFW_PRESS){
+        camera_move(win.main_camera, 0.1, 0.0, 0.0);
+    }
+    if(key_d == GLFW_PRESS){
+        camera_move(win.main_camera, -0.1, 0.0, 0.0);
+    }
+}
 
 
 uint8_t 
