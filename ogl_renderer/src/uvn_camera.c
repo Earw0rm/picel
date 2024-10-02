@@ -4,8 +4,15 @@
 #include "math.h"
 
 struct camera_mat{
+    vector4f u; // right 
+    vector4f v; // up
+    vector4f m; // back
+
+
     matrix4f value;
 };
+
+
 
 /**
  * Notes about implementation
@@ -26,7 +33,7 @@ struct camera_mat{
  * 
  * if camera it is first place person then
  * UP   -> m_pos  += (target * speed)
- * DOWN -> m_pos += (target * speed)
+ * DOWN -> m_pos  += (target * speed)
  * 
  * c=axb -> iff a and b linear independent vector, then c is vector that
  * is perpendicular to both a and b

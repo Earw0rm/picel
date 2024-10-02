@@ -1,6 +1,7 @@
 #ifndef _MATH_H_
 #define _MATH_H_
 #include <math.h>
+#include <stdint.h>
 #include "logger.h"
 #include "math_struct.h"
 
@@ -101,27 +102,82 @@ mdotm4(matrix4f l, matrix4f r) {
     return res;
 }
 
+static inline matrix3f
+mdotm3(matrix3f l, matrix3f r) {
+    matrix3f res;
+    for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 3; ++col) {
+            res.m[col * 3 + row] = 
+                l.m[0 * 3 + row] * r.m[col * 3 + 0] +
+                l.m[1 * 3 + row] * r.m[col * 3 + 1] +
+                l.m[2 * 3 + row] * r.m[col * 3 + 2];
+        }
+    }
+    return res;
+}
 
 static inline matrix4f
 mat4f_transpose(matrix4f m){
-    matrix4f res = {0};
+    matrix4f res;
+    uint8_t i = 0;
+    for (int row = 0; row < 4; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            res.m[i] = m.m[row + col * 4];
+            ++i;
+        }
+    }
+    return res;
+}
+
+static inline matrix3f
+mat3f_transpose(matrix3f m){
+    matrix3f res;
+    uint8_t i = 0;
+    for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 3; ++col) {
+            res.m[i] = m.m[row + col * 3];
+            ++i;
+        }
+    }
+    return res;
+}
+
+static inline vector3f
+vec3f_cross(vector3f a, vector3f b) {
+    vector3f res = {
+        .x = a.y * b.z - a.z * b.y,
+        .y = a.z * b.x - a.x * b.z,
+        .z = a.x * b.y - a.y * b.x
+    };
+    return res;
+}
+
+static inline vector4f 
+vec4f_from3f(vector3f v){
+    vector4f res = {
+        .x = v.x,
+        .y = v.y,
+        .z = v.z,
+        .w = 1
+    };
+    return res;
+}
+
+static inline matrix4f 
+mat4f_from3f(matrix3f m){
+    matrix4f res = mat4f_id(1);
     res.m[0]  = m.m[0];
-    res.m[1]  = m.m[4];
-    res.m[2]  = m.m[8];
-    res.m[3]  = m.m[12];
-    res.m[4]  = m.m[1];
-    res.m[5]  = m.m[5];
-    res.m[6]  = m.m[9];
-    res.m[7]  = m.m[13];
-    res.m[8]  = m.m[2];
-    res.m[9]  = m.m[6];
-    res.m[10] = m.m[10];
-    res.m[11] = m.m[14];
-    res.m[12] = m.m[3];
-    res.m[13] = m.m[7];
-    res.m[14] = m.m[11];
-    res.m[15] = m.m[15];    
-    return res;                                                        
+    res.m[1]  = m.m[1];
+    res.m[2]  = m.m[2];
+
+    res.m[4]  = m.m[3];
+    res.m[5]  = m.m[4];
+    res.m[6]  = m.m[5];
+
+    res.m[8]  = m.m[6];
+    res.m[9]  = m.m[7];
+    res.m[10] = m.m[8];    
+    return res;
 }
 
 static inline matrix4f 
@@ -176,6 +232,7 @@ math4f_diag(float x, float y, float z){
     res.m[10] = z;
     return res;   
 }
+
 static inline matrix4f
 mat4f_scale(matrix4f m, float ax, float by, float cz){
     matrix4f res = mdotm4(
@@ -200,6 +257,35 @@ mat4f_translate(matrix4f m, float x, float y, float z){
      mat4f_translation(x, y, z), m
    );
 }
+
+static inline float
+vec4f_magnitude(vector4f v){
+    return sqrtf(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2));
+}
+
+static inline float
+vec3f_magnitude(vector3f v){
+    return sqrtf(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2));
+}
+
+static inline matrix4f
+mat4f_from3fv(vector3f a, vector3f b, vector3f c){
+    matrix4f res = mat4f_id(1);
+    res.m[0] = a.x;
+    res.m[1] = a.y;
+    res.m[2] = a.z;
+
+    res.m[4] = b.x;
+    res.m[5] = b.y;
+    res.m[6] = b.z;
+
+    res.m[8] = b.x;
+    res.m[9] = b.y;
+    res.m[10]= b.z;
+
+    return res;
+}
+
 
 static inline matrix4f
 mat4f_projection(float hfov, float ar, float nearz, float farz) {
