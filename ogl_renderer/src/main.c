@@ -20,7 +20,11 @@ int main(int argc, char const *argv[]){
     
         event_system_init();
         // TODO check
-        camera main_camera = camera_init();
+        camera main_camera = camera_init(
+            v3f(0, 0, 0),
+            v3f(0, 0, -3.0),
+            v3f(0, 1.0, 0)
+        );
 
         uint8_t win_init_res;
         if((win_init_res = win_init("asd", 1024, 2048)) != SHADER_STATUS_OK){
@@ -108,7 +112,7 @@ int main(int argc, char const *argv[]){
 
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 
 
@@ -116,6 +120,12 @@ int main(int argc, char const *argv[]){
         [[gnu::unused]]float aspect_ratio = win_get_aspect_ratio();
         [[gnu::unused]]float degree = 0.0f;
         while(!win_should_close()){
+
+
+            // const float radius = 2.0f;
+            // float camX = sin(glfwGetTime()) * radius;
+            // float camZ = cos(glfwGetTime()) * radius;
+            // camera_set_position(main_camera, camX, 0.0, camZ);
 
             matrix4f view = camera_get_view(main_camera);
            

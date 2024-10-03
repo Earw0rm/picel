@@ -20,8 +20,14 @@ struct camera_mat{
  * -------------------------
  **/
     float speed;
-    matrix3f uvn;
-    vector3f pos;
+
+    vector3f world_position;
+
+    // actually pointing in the reverse direction
+
+    vector3f direction; // v
+    vector3f up; // v
+    vector3f right; // u
 };
 
 
@@ -87,7 +93,15 @@ struct camera_mat{
  * as glm::lookAt.
  */
 
-static bool on_key_press(event_code code, 
+static void 
+camera_move(camera camera, float x, float y, float z){
+    camera->world_position.x += x * camera->speed;
+    camera->world_position.y += y * camera->speed;
+    camera->world_position.z += z * camera->speed;    
+}
+
+static bool 
+on_key_press(event_code code, 
                          void* sender,
                          void* listener_inst,
                          event_context data){
@@ -95,11 +109,11 @@ static bool on_key_press(event_code code,
     uint16_t key_code = data.data.ui16[0];
 
     if(key_code == GLFW_KEY_W){
-        camera_move(c,  0.0, -0.1, 0.0);
+        camera_move(c,  0.0, 0.0, -0.1);
     }
 
     if(key_code == GLFW_KEY_S){
-        camera_move(c,  0.0, 0.1, 0.0);
+        camera_move(c,  0.0, 0.0, 0.1);
     }
 
     if(key_code == GLFW_KEY_A){
@@ -128,50 +142,36 @@ static bool on_key_press(event_code code,
 
     return false;
 }
+void camera_set_position(camera c, float x, float y, float z){
+    c->world_position = v3f(x, y, z);   
+}
 
-
-camera camera_init(){
+camera camera_init(vector3f camera_position,
+                   vector3f camera_target,
+                   vector3f world_space_up /* |0, 1, 0| by default */){
     camera res = malloc(sizeof(struct camera_mat));
     //TODO crunch
     if(!event_system_register(EVENT_CODE_KEY_PRESSED, res, on_key_press)){
         free(res);
         return nullptr;
     }
+    // should be in math library?
+    // https://en.wikipedia.org/wiki/Gram-Schmidt_process
+    res->world_position = camera_position;
+    res->direction = vec3f_normalize(vec3f_diff(camera_position, camera_target));
+    res->right = vec3f_normalize(vec3f_cross(world_space_up, res->direction));
+    res->up = vec3f_cross(res->direction, res->right);
 
-    res->uvn = mat3f_id(1);
-    res->pos = v3f(0, 0, 0);
     res->speed = 1.0f;
+
     
     return res;
 }
 
-void camera_move(camera camera, float x, float y, float z){
-    camera->pos.x += x * camera->speed;
-    camera->pos.y += y * camera->speed;
-    camera->pos.z += z * camera->speed;    
-}
 
 void camera_rotate(camera camera, float ax, float by, float cz){
-    camera->uvn = mdotm3(mat3f_rotation(ax, by, cz), camera->uvn);
-    // matrix3f rotated = mdotm3(mat3f_rotation(ax, by, cz), camera->uvn);
-    
-    // float u_magnitude = vec3f_magnitude(rotated.m[0], rotated.m[1], rotated.m[2]);
-    // float v_magnitude = vec3f_magnitude(rotated.m[3], rotated.m[4], rotated.m[5]);
-    // float n_magnitude = vec3f_magnitude(rotated.m[6], rotated.m[7], rotated.m[8]);    
-    
-    // rotated.m[0] /=  u_magnitude; 
-    // rotated.m[1] /=  u_magnitude;
-    // rotated.m[2] /=  u_magnitude;
 
-    // rotated.m[3] /=  v_magnitude;
-    // rotated.m[4] /=  v_magnitude;
-    // rotated.m[5] /=  v_magnitude;
 
-    // rotated.m[6] /=  n_magnitude;
-    // rotated.m[7] /=  n_magnitude;
-    // rotated.m[8] /=  n_magnitude;   
-
-    // camera->uvn = rotated;
 }
 
 void camera_destroy(camera camera){
@@ -180,29 +180,31 @@ void camera_destroy(camera camera){
 
 matrix4f camera_get_view(camera camera){
 
-    matrix3f scaled = mat3f_id(1);
+    matrix4f a;
+    matrix4f b = mat4f_id(1);
+    a.m[0] = camera->right.x; 
+    a.m[1] = camera->up.x;                       
+    a.m[2] = camera->direction.x;
+    a.m[3] = 0;
 
-    float u_magnitude = vec3f_magnitude(camera->uvn.m[0], camera->uvn.m[1], camera->uvn.m[2]);
-    float v_magnitude = vec3f_magnitude(camera->uvn.m[3], camera->uvn.m[4], camera->uvn.m[5]);
-    float n_magnitude = vec3f_magnitude(camera->uvn.m[6], camera->uvn.m[7], camera->uvn.m[8]);    
+    a.m[4] = camera->right.y;
+    a.m[5] = camera->up.y;                        
+    a.m[6] = camera->direction.y;
+    a.m[7] = 0;
+
+    a.m[8]  = camera->right.z;
+    a.m[9]  = camera->up.z;                       
+    a.m[10] = camera->direction.z;
+    a.m[11] = 0;
+
+    a.m[12] = 0;
+    a.m[13] = 0;                       
+    a.m[14] = 0;
+    a.m[15] = 1;
+
+    b.m[12] = -camera->world_position.x;
+    b.m[13] = -camera->world_position.y;
+    b.m[14] = -camera->world_position.z;
     
-    scaled.m[0] /=  u_magnitude; 
-    scaled.m[1] /=  u_magnitude;
-    scaled.m[2] /=  u_magnitude;
-
-    scaled.m[3] /=  v_magnitude;
-    scaled.m[4] /=  v_magnitude;
-    scaled.m[5] /=  v_magnitude;
-
-    scaled.m[6] /=  n_magnitude;
-    scaled.m[7] /=  n_magnitude;
-    scaled.m[8] /=  n_magnitude;                            
-
-    matrix4f inverse_uvn = mat4f_from3f(mat3f_transpose(scaled));
-    vector3f tmp_pos = mdotv3(scaled, camera->pos);
-    inverse_uvn.m[12] =-tmp_pos.x;
-    inverse_uvn.m[13] =-tmp_pos.y;
-    inverse_uvn.m[14] =-tmp_pos.z;     
-
-    return inverse_uvn;
+    return mdotm4(a, b);
 }

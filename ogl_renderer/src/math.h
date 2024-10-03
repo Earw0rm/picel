@@ -306,6 +306,17 @@ mat4f_scale(matrix4f m, float ax, float by, float cz){
     return res;
 }
 
+static inline vector3f
+vec3f_diff(vector3f l, vector3f r){
+    vector3f res = {
+        .x = l.x - r.x,
+        .y = l.y - r.y,
+        .z = l.z - r.z
+    };
+    return res;
+}
+
+
 static inline matrix4f
 mat4f_rotate(matrix4f m, float ax, float by, float cz){
     matrix4f res = mdotm4(
@@ -329,6 +340,16 @@ vec4f_magnitude(vector4f v){
 static inline float
 vec3f_magnitude(float x, float y, float z){
     return sqrtf(powf(x, 2) + powf(y, 2) + powf(z, 2));
+}
+static inline vector3f
+vec3f_normalize(vector3f v){
+    float magniture = vec3f_magnitude(v.x, v.y, v.z);
+    vector3f res = {
+        .x = v.x / magniture, 
+        .y = v.y / magniture,
+        .z = v.z / magniture
+    };
+    return res;
 }
 
 static inline matrix4f
