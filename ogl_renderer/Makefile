@@ -25,6 +25,9 @@ OBJ_FILES = $(SRC_OBJ_FILES) $(LIB_OBJ_FILES)
 all: ogl_renderer
 	$(BUILD_DIR)/$(OUT)
 
+debug: ogl_renderer
+	gdb $(BUILD_DIR)/$(OUT)
+
 ogl_renderer: $(OBJ_FILES)
 	$(COMPILER) -o $(BUILD_DIR)/$(OUT) $(OBJ_FILES) $(DEFINES) $(INCLUDE_FLAGS) $(LINKER_FLAGS) $(OPS)
 

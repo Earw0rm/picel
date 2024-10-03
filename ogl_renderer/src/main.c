@@ -13,13 +13,14 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 
-// #include <cglm/cglm.h>   /* for inline */
+#include <cglm/cglm.h>   /* for inline */
 // #include <cglm/call.h>   /* for library call (this also includes cglm.h) */
 
 int main(int argc, char const *argv[]){
     
         event_system_init();
-
+        // TODO check
+        camera main_camera = camera_init();
 
         uint8_t win_init_res;
         if((win_init_res = win_init("asd", 1024, 2048)) != SHADER_STATUS_OK){
@@ -107,7 +108,7 @@ int main(int argc, char const *argv[]){
 
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
 
 
@@ -115,19 +116,24 @@ int main(int argc, char const *argv[]){
         [[gnu::unused]]float aspect_ratio = win_get_aspect_ratio();
         [[gnu::unused]]float degree = 0.0f;
         while(!win_should_close()){
-            // TODO boolsheet
-            win_process_camera_move();
-            matrix4f view = win_get_view();
+
+            matrix4f view = camera_get_view(main_camera);
+           
 
             matrix4f mvp = mat4f_id(1);
             mvp = mat4f_scale(mvp, 0.5f, 0.5f, 0.5f);
             mvp = mat4f_rotate(mvp, 0.0, 0.0, degree);
-            mvp = mat4f_translate(mvp, 1.0, 0.0f, -3.0f);      
+            mvp = mat4f_translate(mvp, 0.0, 0.0f, -3.0f);      
 
             mvp = mdotm4(view, mvp);
 
-            mvp = mat4f_project(mvp, 90.0f, aspect_ratio, 1, 100);
+            mvp = mat4f_project(mvp, 40.0f, aspect_ratio, 1, 100);
 
+            // mat4 dst;
+            // glm_perspective(glm_rad(40), aspect_ratio, 1, 100, dst);
+            
+            // matrix4f tmp = mat4f_from_cglm(dst);
+            // mvp = mdotm4(tmp, mvp);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUniformMatrix4fv(basic_shader.mvp_loc, 1, GL_FALSE, mvp.m);
@@ -137,8 +143,12 @@ int main(int argc, char const *argv[]){
 
             win_swap_buffers();
             win_poll_events();
+            event_system_process_all();
             degree += 1.0f;
         }
         glBindVertexArray(0);
+
+        camera_destroy(main_camera);
+        event_system_destroy();
         exit(EXIT_SUCCESS);
 }

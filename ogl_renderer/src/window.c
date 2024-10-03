@@ -1,7 +1,10 @@
 #include "window.h"
 #include "logger.h"
-#include <stdlib.h>
 #include "uvn_camera.h"
+#include "math.h"
+#include "event_system.h"
+#include <stdlib.h>
+
 
 static struct window{
     const char* title;
@@ -9,8 +12,12 @@ static struct window{
     uint32_t width;
     GLFWwindow* window;
     bool is_initialized;
-    camera main_camera;
+
 } win;
+
+
+
+
 
 static void 
 resize_callback(GLFWwindow* window, int32_t width, int32_t height){
@@ -19,8 +26,6 @@ resize_callback(GLFWwindow* window, int32_t width, int32_t height){
 
 static void
 key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods){
-    LOG_INFO("KeyPress. Key: %i, Scancode: %i, action: %i, mods: %i", 
-             key, scancode, action, mods);
 
     if(key == GLFW_KEY_ESCAPE){
         glfwSetWindowShouldClose(window, true);
@@ -28,26 +33,63 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
 }
 
 
-// TODO tmp
-void 
-win_process_camera_move(){
+
+static void 
+process_camera_move(){
     uint32_t key_w = glfwGetKey(win.window, GLFW_KEY_W);
     uint32_t key_s = glfwGetKey(win.window, GLFW_KEY_S);
     uint32_t key_a = glfwGetKey(win.window, GLFW_KEY_A);
     uint32_t key_d = glfwGetKey(win.window, GLFW_KEY_D);
 
+    uint32_t key_up = glfwGetKey(win.window, GLFW_KEY_UP);
+    uint32_t key_down = glfwGetKey(win.window, GLFW_KEY_DOWN);
+    uint32_t key_left = glfwGetKey(win.window, GLFW_KEY_LEFT);
+    uint32_t key_right = glfwGetKey(win.window, GLFW_KEY_RIGHT);
+
+
     if(key_w == GLFW_PRESS){
-        camera_move(win.main_camera, 0.0, -0.1, 0.0);
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_W; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
     }
     if(key_s == GLFW_PRESS){
-        camera_move(win.main_camera, 0.0, 0.1, 0.0);
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_S; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
     }
     if(key_a == GLFW_PRESS){
-        camera_move(win.main_camera, 0.1, 0.0, 0.0);
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_A; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
     }
     if(key_d == GLFW_PRESS){
-        camera_move(win.main_camera, -0.1, 0.0, 0.0);
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_D; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
     }
+
+
+    if(key_up == GLFW_PRESS){
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_UP; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
+    }
+    if(key_down == GLFW_PRESS){
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_DOWN; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
+    }
+    if(key_left == GLFW_PRESS){
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_LEFT; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
+    }
+    if(key_right == GLFW_PRESS){
+        event_context ctx;
+        ctx.data.ui16[0] = GLFW_KEY_RIGHT; 
+        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
+    }
+
 }
 
 
@@ -85,8 +127,6 @@ win_init(const char* title, uint32_t height, uint32_t width){
     glfwSetKeyCallback(win.window, key_input_callback);
     win.height = height;
     win.width  = width;
-    // TODO CRUNCH
-    win.main_camera = camera_init();
 
     win.is_initialized = true;
     LOG_INFO("Window initialized");
@@ -103,7 +143,7 @@ win_destroy(){
         LOG_DEBUG("cannot destroy not initialized window");
         return;        
     }
-    camera_destroy(win.main_camera);
+
     glfwDestroyWindow(win.window);
     glfwTerminate();
 }
@@ -132,14 +172,11 @@ win_poll_events(){
         return;
     }
     glfwPollEvents();
-    // TODO also hire we need to check LIVE_KEYS
-    // win_process_camera_move now
+    process_camera_move();
 }
 
 float
 win_get_aspect_ratio(){
     return (((float) win.width) / ((float)win.height));
 }
-matrix4f win_get_view(){
-    return camera_get_data(win.main_camera);
-}
+

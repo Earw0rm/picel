@@ -9,6 +9,10 @@ all:
 	make -C ./yasyc build
 	make -C ./ogl_renderer
 
+debug: 
+	make -C ./yasyc build
+	make -C ./ogl_renderer debug
+
 render:
 	make -C ./ogl_renderer
 

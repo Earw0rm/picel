@@ -115,6 +115,7 @@ bool event_system_fire(event_code code, void* sender, event_context context){
     };
     
     dqueue_push_back(dq, event);
+
     return true;
 }
 

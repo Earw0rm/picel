@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include "logger.h"
 #include "math_struct.h"
+#include <string.h>
+
+
+#include <cglm/cglm.h>   /* for inline */
 
 #define PI 3.14159265f
 #define RADIANS2DEGREE(rad) (rad * (180.0f / PI))
@@ -11,12 +15,21 @@
 
 
 static inline void 
-log_matrix(matrix4f m){
+log_matrix4f(matrix4f m){
 
     LOG_INFO("| %f %f %f %f |", m.m[0], m.m[4], m.m[8], m.m[12]);
     LOG_INFO("| %f %f %f %f |", m.m[1], m.m[5], m.m[9], m.m[13]);
     LOG_INFO("| %f %f %f %f |", m.m[2], m.m[6], m.m[10], m.m[14]);
     LOG_INFO("| %f %f %f %f |", m.m[3], m.m[7], m.m[11], m.m[15]);
+    LOG_INFO("===================================================");
+}
+
+static inline void 
+log_matrix3f(matrix3f m){
+
+    LOG_INFO("| %f %f %f|", m.m[0], m.m[3], m.m[6]);
+    LOG_INFO("| %f %f %f|", m.m[1], m.m[4], m.m[7]);
+    LOG_INFO("| %f %f %f|", m.m[2], m.m[5], m.m[8]);
     LOG_INFO("===================================================");
 }
 
@@ -87,6 +100,18 @@ mdotv4(matrix4f m, vector4f v){
     return ret;
 }   
 
+static inline vector3f 
+mdotv3(matrix3f m, vector3f v){
+
+    vector3f ret = v3f(
+        (m.m[0] * v.x) + (m.m[3] * v.y) + (m.m[6] * v.z),
+        (m.m[1] * v.x) + (m.m[4] * v.y) + (m.m[7] * v.z),
+        (m.m[2] * v.x) + (m.m[5] * v.y) + (m.m[8] * v.z)
+    );
+    
+    return ret;
+}   
+
 static inline matrix4f
 mdotm4(matrix4f l, matrix4f r) {
     matrix4f res;
@@ -116,6 +141,7 @@ mdotm3(matrix3f l, matrix3f r) {
     return res;
 }
 
+
 static inline matrix4f
 mat4f_transpose(matrix4f m){
     matrix4f res;
@@ -131,6 +157,7 @@ mat4f_transpose(matrix4f m){
 
 static inline matrix3f
 mat3f_transpose(matrix3f m){
+
     matrix3f res;
     uint8_t i = 0;
     for (int row = 0; row < 3; ++row) {
@@ -139,6 +166,7 @@ mat3f_transpose(matrix3f m){
             ++i;
         }
     }
+
     return res;
 }
 
@@ -224,6 +252,41 @@ mat4f_rotation(float ax, float by, float cz){
     return res;
 }
 
+// expect angle in degree 
+static inline matrix3f
+mat3f_rotation(float ax, float by, float cz){
+    matrix3f res = mat3f_id(1);
+    if(cz != 0){
+        float rad_cz = DEGREE2RADIANS(cz);
+        matrix3f czrot = mat3f_id(1);
+        czrot.m[0]  =  cos(rad_cz);
+        czrot.m[1]  =  sin(rad_cz);
+        czrot.m[4]  = -sin(rad_cz);
+        czrot.m[5]  =  cos(rad_cz);
+        res = mdotm3(czrot, res);
+    }
+    if(by != 0){
+        float rad_by = DEGREE2RADIANS(by);
+        matrix3f byrot = mat3f_id(1);
+        byrot.m[0]  = cos(rad_by);
+        byrot.m[2]  = -sin(rad_by);
+        byrot.m[8]  = sin(rad_by);
+        byrot.m[10] = cos(rad_by);
+        res = mdotm3(byrot, res);
+    }
+    if(ax != 0){
+        float rad_ax = DEGREE2RADIANS(ax);
+        matrix3f axrot = mat3f_id(1);
+        axrot.m[5]  = cos(rad_ax);
+        axrot.m[6]  = sin(rad_ax);
+        axrot.m[9]  = -sin(rad_ax);
+        axrot.m[10] = cos(rad_ax);
+        res = mdotm3(axrot, res);
+    }
+
+    return res;
+}
+
 static inline matrix4f
 math4f_diag(float x, float y, float z){
     matrix4f res = mat4f_id(1);
@@ -264,8 +327,8 @@ vec4f_magnitude(vector4f v){
 }
 
 static inline float
-vec3f_magnitude(vector3f v){
-    return sqrtf(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2));
+vec3f_magnitude(float x, float y, float z){
+    return sqrtf(powf(x, 2) + powf(y, 2) + powf(z, 2));
 }
 
 static inline matrix4f
@@ -292,6 +355,7 @@ mat4f_projection(float hfov, float ar, float nearz, float farz) {
 
     float tanHalfFOV = tanf(DEGREE2RADIANS(hfov / 2));
     float f = 1.0f / tanHalfFOV;
+    
     float val_33 = -(farz + nearz) / (farz - nearz );
     float val_43 = -(2 * farz * nearz) / (farz - nearz );
 
@@ -315,6 +379,11 @@ mat4f_project(matrix4f m, float hfov, float aspect_ratio, float nearz, float far
     
 }
 
-
+static inline matrix4f
+mat4f_from_cglm(mat4 m){
+    matrix4f res;
+    memcpy(&res.m, m, sizeof(float)* 16);
+    return res;
+}
 
 #endif 

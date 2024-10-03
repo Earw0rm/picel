@@ -33,7 +33,13 @@
         "ranges": "c",
         "valarray": "c",
         "stacktrace": "c",
-        "event_system.h": "c"
+        "event_system.h": "c",
+        "chrono": "c",
+        "expected": "c",
+        "optional": "c",
+        "system_error": "c",
+        "__node_handle": "c",
+        "regex": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
