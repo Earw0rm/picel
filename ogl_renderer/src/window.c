@@ -13,11 +13,21 @@ static struct window{
     GLFWwindow* window;
     bool is_initialized;
 
+
+
+
+    // for sending delta to the camera 
+    bool is_delta_initialized;
+    double last_xpos;
+    double last_ypos;
 } win;
 
 
 
-
+[[gnu::unused]]static void
+send_mouse_delta(){
+    
+}
 
 static void 
 resize_callback(GLFWwindow* window, int32_t width, int32_t height){
@@ -34,10 +44,24 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
 
 static void
 mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
-    LOG_INFO("Mouse move %d %d", xpos, ypos);
+
+    if(!win.is_delta_initialized){
+        LOG_INFO("Initializing  %f ypos %f", xpos, ypos);
+        win.last_xpos = xpos;
+        win.last_ypos = ypos;
+
+        win.is_delta_initialized = true;
+        return;
+    }
+
+    double delta_x = (xpos - win.last_xpos);
+    double delta_y = (ypos - win.last_ypos);
+    win.last_xpos = xpos;
+    win.last_ypos = ypos;
+
     event_context ctx;
-    ctx.data.d64[0] = xpos;
-    ctx.data.d64[1] = ypos;
+    ctx.data.d64[0] = delta_x;
+    ctx.data.d64[1] = delta_y;
     event_system_fire(EVENT_CODE_MOUSE_MOVED, nullptr, ctx);
 }
 
@@ -124,6 +148,7 @@ win_init(const char* title, uint32_t height, uint32_t width){
     glfwSetCursorPosCallback(win.window, mouse_callback);  
 
     win.is_initialized = true;
+    win.is_delta_initialized = false;
     LOG_INFO("Window initialized");
     return OK;
 }

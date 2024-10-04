@@ -32,37 +32,24 @@ struct camera_mat{
     float yaw;   // -> around y axis
     // float_t roll;  // -> around z axis
 
-    float last_x;
-    float last_y;
-
-
-    // litle configuration
-    bool first_mouse;
     float mouse_sensitivity;    
 };
 
 
 
-static bool // TODO refactor
+[[gnu::unused]]static bool // TODO refactor
 on_mouse_pos_changed(event_code code, 
              void* sender,
              void* listener_inst,
              event_context data){
     camera c = (camera) listener_inst;
-    double xpos = data.data.d64[0];
-    double ypos = data.data.d64[1];            
 
-    if(c->first_mouse){
-        c->last_x = xpos;
-        c->last_y = ypos;
-        c->first_mouse = false;
-    }
 
-    float xoffset = xpos - c->last_x;
-    float yoffset = ypos - c->last_y; // sinse y-coordinates range from bottom to top we need to invert this?
-    
-    c->yaw   = xoffset * c->mouse_sensitivity;
-    c->pitch = yoffset * c->mouse_sensitivity;
+    double delta_x = data.data.d64[0];
+    double delta_y = data.data.d64[1];            
+
+    c->yaw   += c->mouse_sensitivity * (delta_x);
+    c->pitch += c->mouse_sensitivity * (delta_y); // sinse y-coordinates range from bottom to top we need to invert this?
 
     // if pitch == 90 then we will break it Gram-Schmidt_process sinse camera == world_space_up direction 
     if(c->pitch > 89.0f){
@@ -78,10 +65,20 @@ on_mouse_pos_changed(event_code code,
         .z = sinf(DEGREE2RADIANS(c->yaw)) * cosf(DEGREE2RADIANS(c->pitch)),
     };
 
+
+    LOG_INFO("direction before update x:%f y:%f z:%f", 
+    c->direction.x, c->direction.y, c->direction.z);
+
     // after updating direction we need to consyst of right and up vector
     c->direction = vec3f_normalize(direction);
+
+    LOG_INFO("direction before update x:%f y:%f z:%f", 
+    c->direction.x, c->direction.y, c->direction.z);
+
     c->right = vec3f_normalize(vec3f_cross(c->world_space_up, c->direction));
     c->up = vec3f_cross(c->direction, c->right);
+
+
 
     return false;
 }
@@ -132,7 +129,7 @@ camera camera_init(vector3f camera_position,
         free(res);
         return nullptr;
     }
-    //TODO crunch again
+    // // TODO crunch again
     if(!event_system_register(EVENT_CODE_MOUSE_MOVED, res, on_mouse_pos_changed)){
         free(res);
         return nullptr;
@@ -147,11 +144,12 @@ camera camera_init(vector3f camera_position,
     res->up = vec3f_cross(res->direction, res->right);
 
     res->speed = 0.1f;
-    res->last_x = 0;
-    res->last_y = 0;
+
     //default values
-    res->yaw = -90.0f;
+    res->yaw = 90;
     res->pitch = 0;
+
+
     res->mouse_sensitivity = 0.01f;
     return res;
 }
@@ -162,26 +160,31 @@ void camera_destroy(camera camera){
     free(camera);
 }
 
-matrix4f camera_get_view(camera camera){
+matrix4f camera_get_view(camera c){
+
+    // if(counter < 10){
+    //     LOG_INFO(" Picth %f Yawl %f", c->pitch, c->yaw);
+    // }
+    // ++counter;
+
 
     matrix4f a = mat4f_id(1);
     matrix4f b = mat4f_id(1);
-    a.m[0] = camera->right.x; 
-    a.m[1] = camera->up.x;                       
-    a.m[2] = camera->direction.x;
+    a.m[0] = c->right.x; 
+    a.m[1] = c->up.x;                       
+    a.m[2] = c->direction.x;
 
-    a.m[4] = camera->right.y;
-    a.m[5] = camera->up.y;                        
-    a.m[6] = camera->direction.y;
+    a.m[4] = c->right.y;
+    a.m[5] = c->up.y;                        
+    a.m[6] = c->direction.y;
 
-    a.m[8]  = camera->right.z;
-    a.m[9]  = camera->up.z;                       
-    a.m[10] = camera->direction.z;
+    a.m[8]  = c->right.z;
+    a.m[9]  = c->up.z;                       
+    a.m[10] = c->direction.z;
 
-    b.m[12] = -camera->world_position.x;
-    b.m[13] = -camera->world_position.y;
-    b.m[14] = -camera->world_position.z;
+    b.m[12] = -c->world_position.x;
+    b.m[13] = -c->world_position.y;
+    b.m[14] = -c->world_position.z;
     matrix4f res = mdotm4(a, b);
-    log_matrix4f(res);
     return res;
 }
