@@ -148,8 +148,6 @@ camera camera_init(vector3f camera_position,
     //default values
     res->yaw = 90;
     res->pitch = 0;
-
-
     res->mouse_sensitivity = 0.01f;
     return res;
 }
