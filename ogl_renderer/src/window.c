@@ -32,7 +32,14 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
     }
 }
 
-
+static void
+mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
+    LOG_INFO("Mouse move %d %d", xpos, ypos);
+    event_context ctx;
+    ctx.data.d64[0] = xpos;
+    ctx.data.d64[1] = ypos;
+    event_system_fire(EVENT_CODE_MOUSE_MOVED, nullptr, ctx);
+}
 
 static void 
 process_camera_move(){
@@ -41,10 +48,10 @@ process_camera_move(){
     uint32_t key_a = glfwGetKey(win.window, GLFW_KEY_A);
     uint32_t key_d = glfwGetKey(win.window, GLFW_KEY_D);
 
-    uint32_t key_up = glfwGetKey(win.window, GLFW_KEY_UP);
-    uint32_t key_down = glfwGetKey(win.window, GLFW_KEY_DOWN);
-    uint32_t key_left = glfwGetKey(win.window, GLFW_KEY_LEFT);
-    uint32_t key_right = glfwGetKey(win.window, GLFW_KEY_RIGHT);
+    // uint32_t key_up = glfwGetKey(win.window, GLFW_KEY_UP);
+    // uint32_t key_down = glfwGetKey(win.window, GLFW_KEY_DOWN);
+    // uint32_t key_left = glfwGetKey(win.window, GLFW_KEY_LEFT);
+    // uint32_t key_right = glfwGetKey(win.window, GLFW_KEY_RIGHT);
 
 
     if(key_w == GLFW_PRESS){
@@ -65,28 +72,6 @@ process_camera_move(){
     if(key_d == GLFW_PRESS){
         event_context ctx;
         ctx.data.ui16[0] = GLFW_KEY_D; 
-        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-    }
-
-
-    if(key_up == GLFW_PRESS){
-        event_context ctx;
-        ctx.data.ui16[0] = GLFW_KEY_UP; 
-        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-    }
-    if(key_down == GLFW_PRESS){
-        event_context ctx;
-        ctx.data.ui16[0] = GLFW_KEY_DOWN; 
-        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-    }
-    if(key_left == GLFW_PRESS){
-        event_context ctx;
-        ctx.data.ui16[0] = GLFW_KEY_LEFT; 
-        event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-    }
-    if(key_right == GLFW_PRESS){
-        event_context ctx;
-        ctx.data.ui16[0] = GLFW_KEY_RIGHT; 
         event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
     }
 
@@ -127,6 +112,16 @@ win_init(const char* title, uint32_t height, uint32_t width){
     glfwSetKeyCallback(win.window, key_input_callback);
     win.height = height;
     win.width  = width;
+
+    /**
+     * Hide the cursor and capture it.
+     * Capturing a cursor means that, once the application has focus, 
+     * the mouse cursor stays within the center of the window 
+     * (unless the application loses focus or quits). We can do
+     * this with one simple configuration call:
+     */
+    glfwSetInputMode(win.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(win.window, mouse_callback);  
 
     win.is_initialized = true;
     LOG_INFO("Window initialized");

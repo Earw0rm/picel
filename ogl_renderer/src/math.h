@@ -316,6 +316,25 @@ vec3f_diff(vector3f l, vector3f r){
     return res;
 }
 
+static inline vector3f
+vec3f_summ(vector3f l, vector3f r){
+    vector3f res = {
+        .x = l.x + r.x,
+        .y = l.y + r.y,
+        .z = l.z + r.z
+    };
+    return res;
+}
+
+static inline vector3f
+vec3f_scalar_mul(vector3f l, float scalar){
+    vector3f res = {
+        .x = l.x * scalar,
+        .y = l.y * scalar,
+        .z = l.z * scalar
+    };
+    return res;
+}
 
 static inline matrix4f
 mat4f_rotate(matrix4f m, float ax, float by, float cz){

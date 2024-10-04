@@ -21,7 +21,7 @@ int main(int argc, char const *argv[]){
         event_system_init();
         // TODO check
         camera main_camera = camera_init(
-            v3f(0, 0, 0),
+            v3f(0, 0, 5.0f),
             v3f(0, 0, -3.0),
             v3f(0, 1.0, 0)
         );

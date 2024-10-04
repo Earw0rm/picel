@@ -8,7 +8,7 @@ typedef struct event_context{
     union{
         int64_t   i64[2];
         uint64_t ui64[2];
-        double    d64[2];
+        double  d64[2];
 
         int32_t   i32[4];
         uint32_t ui32[4];
@@ -51,19 +51,18 @@ typedef enum event_code{
 
     /**
      * Context usage:
-     * u16 x = data.u16[0]
-     * u16 y = data.u16[1]
+     * double_t xpos = d64[0];
+     * double_t ypos = d64[1];
      */
     EVENT_CODE_MOUSE_MOVED = 0x06,    
 
     /**
-     * Context usage:
-     * u16 z_delta = data.u8[0]
+     * Context usage: ?? 
      */
     EVENT_CODE_MOUSE_WHEEL = 0x07,
 
     /**
-     * Context usage:
+     * Context usage: wtf
      * u16 width = data.u16[0]
      * u16 height = data.u16[1]
      */
