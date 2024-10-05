@@ -5,8 +5,7 @@
 
 
 
-#define BASIC_CAPACITY 2
-#define SCALE_FACTOR 2
+
 
 typedef struct dqueue_header{
     uint64_t capacity;
@@ -21,8 +20,8 @@ struct dqueue_intr{
     void* values;
 };
 
-void dqueue_scale(dqueue dq){
-    uint64_t new_capacity = dq->header.capacity * SCALE_FACTOR ;
+static void dqueue_scale(dqueue dq){
+    uint64_t new_capacity = dq->header.capacity * DQUEUE_SCALE_FACTOR ;
     uint64_t new_lenght = dq->header.lenght - dq->header.head_idx;
 
     void* old_values = dq->values;
@@ -41,9 +40,9 @@ void dqueue_scale(dqueue dq){
 
 dqueue _dqueue_alloc(uint64_t stride){
     dqueue dq = malloc(sizeof(struct dqueue_intr));
-    dq->values = malloc(stride * BASIC_CAPACITY);
+    dq->values = malloc(stride * DQUEUE_BASIC_CAPACITY);
 
-    dq->header.capacity = BASIC_CAPACITY;
+    dq->header.capacity = DQUEUE_BASIC_CAPACITY;
     dq->header.stride   = stride;
     dq->header.lenght   = 0;
     dq->header.head_idx = 0;

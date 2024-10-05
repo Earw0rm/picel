@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#define BASIC_CAPACITY 2
-#define SCALE_FACTOR 2
+
 
 
 typedef struct darray_header{
@@ -20,9 +19,16 @@ struct darray_intr{
 
 darray _darray_alloc(uint64_t stride){
     darray da  = malloc(sizeof(struct darray_intr));
-    da->values = malloc(stride * BASIC_CAPACITY);
+    assert(da != nullptr && 
+        "cannot allocate darray" 
+    );
 
-    da->header.capacity = BASIC_CAPACITY;
+    da->values = malloc(stride * DARRAY_BASIC_CAPACITY);
+    assert(da->values != nullptr && 
+        "cannot allocate darray" 
+    );
+
+    da->header.capacity = DARRAY_BASIC_CAPACITY;
     da->header.stride   = stride;
     da->header.lenght   = 0;
     return da;
@@ -46,13 +52,20 @@ void darray_push_back(darray da, void* elem){
     da->header.lenght += 1;
 }
 
-void darray_scale(darray da){
-    void* new_value_ptr = realloc(da->values, da->header.capacity * SCALE_FACTOR);
+void darray_reserve(darray da, uint64_t new_capacity){
+    if(da->header.capacity >= new_capacity) return;
+    void* new_value_ptr = realloc(da->values, new_capacity * dq->header.stride);
     assert(new_value_ptr != nullptr && 
         "cannot reallocate darray" 
     );
     da->values = new_value_ptr;
 }
+
+static void darray_scale(darray da){
+    darray_reserve(da, da->header.capacity * DARRAY_SCALE_FACTOR);
+}
+
+
 
 uint64_t darray_stride(darray da){
     return da->header.stride;
