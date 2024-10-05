@@ -2,8 +2,10 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "yasyc_test.h"
+#include <stdarg.h>
 
+#include "yasyc_test.h"
+#include "defines.h"
 int test1(){
     dqueue val1  = _dqueue_alloc(sizeof(int));
     dqueue_free(val1);
@@ -150,15 +152,64 @@ int test6(){
     ASSERT(i3 == i13, "addreses of values in dqueue should be same when we use push/pop sequentialy");
     return 1;
 }
-int main(int argc, char const *argv[])
-{
+
+
+void dqueue_tests(){
     TEST("basic alloc/free test", test1);
     TEST("basic capasity/scale test", test2);
     TEST("basic push/pop test", test3);
     TEST("massive push test", test4);
     TEST("massive push/pop test", test5);
     TEST("capacity and adresses test", test6);
+}
+
+typedef struct foof{
+    float a;
+} foof;
+
+typedef struct food{
+    double a;
+} food;
+
+typedef struct fooc{
+    char a;
+} fooc;
 
 
+[[gnu::unused]]static size_t sizes[3] = {
+    sizeof(food), sizeof(foof), sizeof(fooc)
+};
+
+int _true_macro_test(uint64_t num, ...){
+    va_list ap;
+    uint32_t a = 0;
+    va_start(ap, num);
+
+    a = va_arg(ap, uint32_t);
+    ASSERT(sizes[0] == a, "true macros should return sizeof for all typec correctly");
+    a = va_arg(ap, uint32_t);    
+    ASSERT(sizes[1] == a, "true macros should return sizeof for all typec correctly");
+    a = va_arg(ap, uint32_t);    
+    ASSERT(sizes[2] == a, "true macros should return sizeof for all typec correctly");   
+    va_end(ap);
+    return 1;
+}
+
+#define true_macro_test(...) _true_macro_test(VA_NARGS(__VA_ARGS__), SIZEOF_ALL(__VA_ARGS__))
+
+int tt_test(){
+    return true_macro_test(food, foof, fooc);
+}
+
+void darray_tests(){
+
+}
+
+int main(int argc, char const *argv[])
+{
+    dqueue_tests();
+    TEST("This is mad macro test. If u need debug this use -E for preprocessor only and -P to delete #line", tt_test);
+
+    
     return 0;
 }

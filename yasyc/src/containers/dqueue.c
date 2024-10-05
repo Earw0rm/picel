@@ -26,6 +26,7 @@ void dqueue_scale(dqueue dq){
     uint64_t new_lenght = dq->header.lenght - dq->header.head_idx;
 
     void* old_values = dq->values;
+    // hire we use malloc instead of realloc because we need copy only alive elements in queue
     void* new_values = malloc(new_capacity * dq->header.stride);
     memcpy(new_values,
            &old_values[dq->header.head_idx * dq->header.stride],

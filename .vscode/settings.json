@@ -39,7 +39,10 @@
         "optional": "c",
         "system_error": "c",
         "__node_handle": "c",
-        "regex": "c"
+        "regex": "c",
+        "stdlib.h": "c",
+        "darray.h": "c",
+        "string.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
