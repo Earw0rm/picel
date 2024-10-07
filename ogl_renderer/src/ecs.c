@@ -39,6 +39,7 @@ void ecs_init(){
     store.inactive_entities = dqueue_alloc(int64_t);
     store.components = darray_alloc(ecs_component_set);
     store.query_res = darray_alloc(ecs_entity);
+
 }
 void ecs_destroy(){
     dqueue_free(store.inactive_entities);
@@ -69,34 +70,29 @@ ecs_entity ecs_create_entity(){
  */
 void* _ecs_get_component(ecs_entity e, component_id id){
     ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
-    return (&cs[id]);
+    return (void*)((char*)cs + id);
 }
 
-component_mask _ecs_has_components(ecs_entity e, component_mask mask){
+active_components_array ecs_has_components(ecs_entity e){
     ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
-    return (cs->arr & mask);
+
+    return cs->arr;
 }
 
 void _ecs_remove_components(ecs_entity e, component_mask mask){
     ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
     cs->arr = (cs->arr &(~mask));
 }
+
 void _ecs_add_components(ecs_entity e, component_mask mask){
-
     ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
-    if(cs == nullptr){
-        LOG_INFO("nullptr  %i", e);    
-    }
-
     cs->arr = (cs->arr | mask);
 
 }
 
 void ecs_destroy_entity(ecs_entity e){
     ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
-    
-    cs->arr = COMPONENT_MASK_OF(unactive);
-
+    cs->arr = COMPONENT_MASK_OF(unactive); 
     dqueue_push_back(store.inactive_entities, e);
 }
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
+#include "logger.h"
 
 
 typedef struct darray_header{
@@ -45,6 +45,7 @@ void* darray_at(darray da, uint64_t n){
 }
 
 void darray_reserve(darray da, uint64_t new_capacity){
+
     if(da->header.capacity >= new_capacity) return;
     void* new_value_ptr = realloc(da->values, new_capacity * da->header.stride);
     assert(new_value_ptr != nullptr && 

@@ -11,7 +11,7 @@
 
 
 typedef uint64_t ecs_entity;
-typedef uint64_t active_components_array;
+typedef int64_t active_components_array;
 //component id it is offset inside ecs_component_set
 typedef uint64_t component_id;
 

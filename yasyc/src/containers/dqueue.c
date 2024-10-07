@@ -46,6 +46,7 @@ dqueue _dqueue_alloc(uint64_t stride){
     dq->header.stride   = stride;
     dq->header.lenght   = 0;
     dq->header.head_idx = 0;
+
     return dq;
 }
 
