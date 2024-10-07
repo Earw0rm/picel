@@ -3,9 +3,11 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stddef.h>
 
 #include "yasyc_test.h"
 #include "defines.h"
+
 int test1(){
     dqueue val1  = _dqueue_alloc(sizeof(int));
     dqueue_free(val1);
@@ -176,7 +178,7 @@ typedef struct fooc{
 } fooc;
 
 
-[[gnu::unused]]static size_t sizes[3] = {
+static size_t sizes[3] = {
     sizeof(food), sizeof(foof), sizeof(fooc)
 };
 
@@ -195,10 +197,51 @@ int _true_macro_test(uint64_t num, ...){
     return 1;
 }
 
+typedef struct test_substruct_1{
+    uint64_t a;
+} test_substruct_1;
+
+typedef struct test_substruct_2{
+    uint64_t b;
+    char a[10];
+} test_substruct_2;
+
+struct test_struct{
+    test_substruct_1 t;
+    test_substruct_2 t2;
+    test_substruct_2 t3;    
+};
+
+static size_t offsets[3] = {
+    offsetof(struct test_struct, t), 
+    offsetof(struct test_struct, t2),
+    offsetof(struct test_struct, t3)
+};
+
+int _true_macro_test2(uint64_t num, ...){
+    va_list ap;
+    uint32_t a = 0;
+    va_start(ap, num);
+
+    a = va_arg(ap, uint32_t);
+    ASSERT(offsets[0] == a, "true macros 2 should return offsetof for all names correctly");
+    a = va_arg(ap, uint32_t);    
+    ASSERT(offsets[1] == a, "true macros 2 should return offsetof for all names correctly");
+    a = va_arg(ap, uint32_t);    
+    ASSERT(offsets[2] == a, "true macros 2 should return offsetof for all names correctly");   
+    va_end(ap);
+    return 1;
+}
+
 #define true_macro_test(...) _true_macro_test(VA_NARGS(__VA_ARGS__), SIZEOF_ALL(__VA_ARGS__))
+#define true_macro_test2(...) _true_macro_test2(VA_NARGS(__VA_ARGS__), OFFSETOF_ALL(struct test_struct, __VA_ARGS__))
 
 int tt_test(){
     return true_macro_test(food, foof, fooc);
+}
+
+int tt_test2(){
+    return true_macro_test2(t, t2, t3);
 }
 
 void darray_tests(){
@@ -209,7 +252,7 @@ int main(int argc, char const *argv[])
 {
     dqueue_tests();
     TEST("This is mad macro test. If u need debug this use -E for preprocessor only and -P to delete #line", tt_test);
+    TEST("This is test for offsetof_all macros. If u need debug this use -E for preprocessor only and -P to delete #line", tt_test2);
 
-    
     return 0;
 }

@@ -40,21 +40,13 @@ void darray_free(darray da){
 }
 
 void* darray_at(darray da, uint64_t n){
-    if(n > da->header.lenght) return nullptr;
+    if(n >= da->header.lenght) return nullptr;
     return &da->values[da->header.stride * n];
-}
-
-void darray_push_back(darray da, void* elem){
-    if(da->header.lenght == da->header.capacity){
-        darray_scale(da);
-    }
-    memcpy(&da->values[da->header.lenght * da->header.stride], elem, da->header.stride);
-    da->header.lenght += 1;
 }
 
 void darray_reserve(darray da, uint64_t new_capacity){
     if(da->header.capacity >= new_capacity) return;
-    void* new_value_ptr = realloc(da->values, new_capacity * dq->header.stride);
+    void* new_value_ptr = realloc(da->values, new_capacity * da->header.stride);
     assert(new_value_ptr != nullptr && 
         "cannot reallocate darray" 
     );
@@ -65,7 +57,17 @@ static void darray_scale(darray da){
     darray_reserve(da, da->header.capacity * DARRAY_SCALE_FACTOR);
 }
 
+void _darray_push_back(darray da, void* elem){
+    if(da->header.lenght == da->header.capacity){
+        darray_scale(da);
+    }
+    memcpy(&da->values[da->header.lenght * da->header.stride], elem, da->header.stride);
+    da->header.lenght += 1;
+}
 
+void darray_clear(darray da){
+    da->header.lenght = 0;
+}
 
 uint64_t darray_stride(darray da){
     return da->header.stride;

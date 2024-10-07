@@ -32,6 +32,18 @@
 #define SIZEOF_9(a, b, c, d, e, f, g, h, i) sizeof(a), sizeof(b), sizeof(c), sizeof(d), sizeof(e), sizeof(f), sizeof(g), sizeof(h), sizeof(i)
 #define SIZEOF_10(a, b, c, d, e, f, g, h, i, j) sizeof(a), sizeof(b), sizeof(c), sizeof(d), sizeof(e), sizeof(f), sizeof(g), sizeof(h), sizeof(i), sizeof(j)
 
+#define OFFSET_OF_1(type, a) offsetof(type, a)
+#define OFFSET_OF_2(type, a, b) offsetof(type, a), offsetof(type, b)
+#define OFFSET_OF_3(type, a, b, c) offsetof(type, a), offsetof(type, b), offsetof(type, c)
+#define OFFSET_OF_4(type, a, b, c, d) offsetof(type, a), offsetof(type, b), offsetof(type, c), offsetof(type, d)
+#define OFFSET_OF_5(type, a, b, c, d, e) offsetof(type, a), offsetof(type, b), offsetof(type, c), offsetof(type, d), offsetof(type, e)
+#define OFFSET_OF_6(type, a, b, c, d, e, f) offsetof(type, a), offsetof(type, b), offsetof(type, c), offsetof(type, d), offsetof(type, e), offsetof(type, f)
+#define OFFSET_OF_7(type, a, b, c, d, e, f, g) offsetof(type, a), offsetof(type, b), offsetof(type, c), offsetof(type, d), offsetof(type, e), offsetof(type, f), offsetof(type, g)
+#define OFFSET_OF_8(type, a, b, c, d, e, f, g, h) offsetof(type, a), offsetof(type, b), offsetof(type, c), offsetof(type, d), offsetof(type, e), offsetof(type, f), offsetof(type, g), offsetof(type, h)
+#define OFFSET_OF_9(type, a, b, c, d, e, f, g, h, i) offsetof(type, a), offsetof(type, b), offsetof(type, c), offsetof(type, d), offsetof(type, e), offsetof(type, f), offsetof(type, g), offsetof(type, h), offsetof(type, i)
+#define OFFSET_OF_10(type,a, b, c, d, e, f, g, h, i, j) offsetof(type, a), offsetof(type, b), offsetof(type, c), offsetof(type, d), offsetof(type, e), offsetof(type, f), offsetof(type, g), offsetof(type, h), offsetof(type, i), offsetof(type, j)
+
+
 #define CONCAT_IMPL(a, b) a##b
 #define CONCAT(a, b) CONCAT_IMPL(a, b)
 
@@ -40,6 +52,8 @@
 #define SIZEOF_N(N, ...) CONCAT(SIZEOF_, N)(__VA_ARGS__)
 #define SIZEOF_ALL(...) SIZEOF_N(VA_NARGS(__VA_ARGS__), __VA_ARGS__)
 
+#define OFFSETOF_N(type, N, ...) CONCAT(OFFSET_OF_, N)(type, __VA_ARGS__)
+#define OFFSETOF_ALL(type, ...) OFFSETOF_N(type, VA_NARGS(__VA_ARGS__), __VA_ARGS__)
 
 
 

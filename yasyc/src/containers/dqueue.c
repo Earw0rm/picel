@@ -20,7 +20,7 @@ struct dqueue_intr{
     void* values;
 };
 
-static void dqueue_scale(dqueue dq){
+void dqueue_scale(dqueue dq){
     uint64_t new_capacity = dq->header.capacity * DQUEUE_SCALE_FACTOR ;
     uint64_t new_lenght = dq->header.lenght - dq->header.head_idx;
 

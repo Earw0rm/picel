@@ -43,7 +43,12 @@
         "stdlib.h": "c",
         "darray.h": "c",
         "string.h": "c",
-        "assert.h": "c"
+        "assert.h": "c",
+        "defines.h": "c",
+        "complex": "c",
+        "*.inc": "c",
+        "random": "c",
+        "numbers": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

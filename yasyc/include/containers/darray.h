@@ -19,10 +19,19 @@ API void  darray_free(darray da);
  * A value can be written to or read from this cell.
  */
 API void* darray_at(darray da, uint64_t n);
-API void  darray_push_back(darray da, void* elem);
+
 API void  darray_reserve(darray da, uint64_t new_capacity);
+API void  darray_clear(darray da);
 
 API uint64_t darray_stride(darray da);
 API uint64_t darray_lenght(darray da);
 API uint64_t darray_capacity(darray da);
+
+
+API void _darray_push_back(darray da, void* elem);
+#define darray_push_back(dq, elem) do{       \
+    typeof(elem) val = elem;                 \
+    _darray_push_back(dq, (void*) &val);     \
+} while(0)       
+
 #endif 

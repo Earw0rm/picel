@@ -22,7 +22,7 @@ API dqueue _dqueue_alloc(uint64_t stride);
 API void dqueue_free(dqueue dq);
 API void* dqueue_pop_front(dqueue dq);
 API void _dqueue_push_back(dqueue dq, void* elem);
-
+API void dqueue_scale(dqueue dq);
 
 API uint64_t dqueue_stride(dqueue dq);
 API uint64_t dqueue_lenght(dqueue dq);
