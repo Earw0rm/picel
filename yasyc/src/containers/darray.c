@@ -51,6 +51,7 @@ void darray_reserve(darray da, uint64_t new_capacity){
         "cannot reallocate darray" 
     );
     da->values = new_value_ptr;
+    da->header.capacity = new_capacity;
 }
 
 static void darray_scale(darray da){

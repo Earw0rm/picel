@@ -1,4 +1,6 @@
+
 #include "containers/dqueue.h"
+#include "containers/darray.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -244,8 +246,126 @@ int tt_test2(){
     return true_macro_test2(t, t2, t3);
 }
 
-void darray_tests(){
 
+
+/////////////////////////////////////
+
+
+int darray_test1(){
+    darray val1 = darray_alloc(int);
+    uint64_t cap1    = darray_capacity(val1);
+    uint64_t stride1 = darray_stride(val1);
+    uint64_t lenght1 = darray_lenght(val1);
+
+    ASSERT(cap1 == 2, "basic capacity should be equal to 2");
+    ASSERT(stride1 == 4, "basic int stride should be equal to 4");
+    ASSERT(lenght1 == 0, "basic lenght should be equal to 2");    
+
+
+    darray_reserve(val1, 42);
+ 
+    uint64_t cap2    = darray_capacity(val1);
+    uint64_t stride2 = darray_stride(val1);
+    uint64_t lenght2 = darray_lenght(val1);
+
+    ASSERT(cap2 == 42, "capacity after scaling should be 42");
+    ASSERT(stride2 == 4, "stride after scaling should no change");
+    ASSERT(lenght2 == 0, "lenght after scaling without insert should not change");
+
+    darray_reserve(val1, 43);
+
+    uint64_t cap3 = darray_capacity(val1);
+    ASSERT(cap3 == 43, "capacity after scaling should be 43");
+
+
+    darray_reserve(val1, 42);
+
+    uint64_t cap4 = darray_capacity(val1);
+    ASSERT(cap4 == 43, "capacity after downscaling should not changed ");
+
+    darray_free(val1);
+
+    return 1;
+}
+
+
+int darray_test2(){
+    
+
+    darray val1 = darray_alloc(float);
+    darray_push_back(val1, 10.0f);
+
+    uint64_t cap1    = darray_capacity(val1);
+    uint64_t stride1 = darray_stride(val1);
+    uint64_t lenght1 = darray_lenght(val1);
+
+    ASSERT(cap1    == 2, "one element push, capasity should not change");
+    ASSERT(stride1 == sizeof(float), "stride after push should not change");
+    ASSERT(lenght1 == 1, "lenght after push should be += 1");
+
+    darray_push_back(val1, 11.0f);
+
+    uint64_t cap2    = darray_capacity(val1);
+    uint64_t stride2 = darray_stride(val1);
+    uint64_t lenght2 = darray_lenght(val1);
+
+    ASSERT(cap2    == 2, "one element push, capasity should not change");
+    ASSERT(stride2 == sizeof(float), "stride after push should not change");
+    ASSERT(lenght2 == 2, "lenght after push should be += 1");
+
+
+    darray_push_back(val1, 12.0f);
+
+    uint64_t cap3    = darray_capacity(val1);
+    uint64_t stride3 = darray_stride(val1);
+    uint64_t lenght3 = darray_lenght(val1);
+
+    ASSERT(cap3    == 4, "capasity should change after 3 basic push back");
+    ASSERT(stride3 == sizeof(float), "stride after push should not change");
+    ASSERT(lenght3 == 3, "lenght after push should be += 1");
+
+
+    float* i1 = (float*) darray_at(val1, 0);
+    float* i2 = (float*)darray_at(val1, 1);
+    float* i3 = (float*)darray_at(val1, 2);
+
+    ASSERT(*i1 == 10, "value inside array at n position must be correct after push some value");
+    ASSERT(*i2 == 11, "value inside array at n position must be correct after push some value");
+    ASSERT(*i3 == 12, "value inside array at n position must be correct after push some value");
+
+    return 1;
+}
+
+int darray_test3(){
+    const int test_arr_sz = 1000;
+    float test_arr[test_arr_sz];
+ 
+    darray da = darray_alloc(float);
+    darray_reserve(da, 1001);
+    for(float i = 0.0f; (int)i < test_arr_sz; i += 1.0f){
+        test_arr[(int)i] = i;
+        darray_push_back(da, i);
+    }
+
+    bool all_eq = true;
+
+    for(float i = 0.0f; (int)i < test_arr_sz; i += 1.0f){
+        float* elem = (float*)darray_at(da, (int)i);
+        if(test_arr[(int)i] != *elem){
+            LOG_ERROR("MPT %f = %f", test_arr[(int)i], *elem);
+            all_eq = false;
+        }
+    }
+    ASSERT(all_eq == true, "element in darr need to be in correct push order");
+    ASSERT(1001 == darray_capacity(da), "capacity should not change");    
+    return 1;
+}
+
+
+void darray_tests(){
+    TEST("darray basic capasity/scale test", darray_test1);
+    TEST("darray basic push/pop test", darray_test2);
+    TEST("darray massive push test", darray_test3);
 }
 
 int main(int argc, char const *argv[])
@@ -253,6 +373,6 @@ int main(int argc, char const *argv[])
     dqueue_tests();
     TEST("This is mad macro test. If u need debug this use -E for preprocessor only and -P to delete #line", tt_test);
     TEST("This is test for offsetof_all macros. If u need debug this use -E for preprocessor only and -P to delete #line", tt_test2);
-
+    darray_tests();
     return 0;
 }

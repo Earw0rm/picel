@@ -16,6 +16,9 @@ debug:
 render:
 	make -C ./ogl_renderer
 
+test:
+	make -C ./yasyc test
+	make -C ./ogl_renderer test
 
 run: 
 	make -C ./ogl_renderer run 

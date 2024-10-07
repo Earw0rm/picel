@@ -13,8 +13,13 @@ LIB_NAME = libyasyc.so
 all:
 	clang -g $(SOURCES) $(TESTS) $(OPS) $(INCLUDE) -o $(TESTBED_NAME)
 	./$(TESTBED_NAME)
+
 build:
 	clang -g -shared $(SOURCES) $(TESTS) $(OPS) $(INCLUDE) -o $(LIB_NAME)
+
+test:
+	clang -g $(SOURCES) $(TESTS) $(OPS) $(INCLUDE) -o $(TESTBED_NAME)
+	./$(TESTBED_NAME)
 
 clean:
 	rm ./$(LIB_NAME)
