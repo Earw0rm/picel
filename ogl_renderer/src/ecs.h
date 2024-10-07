@@ -21,7 +21,8 @@ void* _ecs_get_component(ecs_entity e, component_id id);
 component_mask _ecs_has_components(ecs_entity e, component_mask mask);
 #define ecs_has_components(e, ...) _ecs_has_components(e, COMPONENT_MASK_OF_ALL(__VA_ARGS__))
 
-//void _ecs_remove_component(ecs_entity e, component_mask mask);
+void _ecs_add_components(ecs_entity e, component_mask mask);
+#define ecs_add_components(e, ...) _ecs_add_components(e, COMPONENT_MASK_OF_ALL(__VA_ARGS__))
 
 void _ecs_remove_components(ecs_entity e, component_mask mask);
 #define ecs_remove_components(e, ...) _ecs_remove_component(e, COMPONENT_MASK_OF_ALL(__VA_ARGS__))

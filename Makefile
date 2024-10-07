@@ -17,6 +17,7 @@ render:
 	make -C ./ogl_renderer
 
 test:
+	make -C ./yasyc build
 	make -C ./yasyc test
 	make -C ./ogl_renderer test
 

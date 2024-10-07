@@ -28,7 +28,7 @@ OBJ_FILES = $(SRC_OBJ_FILES) $(LIB_OBJ_FILES)
 OBJ_FILES_NO_MAIN = $(filter-out $(BUILD_DIR)/src/main.o, $(OBJ_FILES)) $(TEST_OBJ_FILES)
 
 
-.PHONY: all clean
+.PHONY: all clean test 
 
 all: ogl_renderer
 	$(BUILD_DIR)/$(OUT)
@@ -43,7 +43,7 @@ ogl_renderer: $(OBJ_FILES)
 	$(COMPILER) -o $(BUILD_DIR)/$(OUT) $(OBJ_FILES) $(DEFINES) $(INCLUDE_FLAGS) $(LINKER_FLAGS) $(OPS)
 
 ogl_renderer_test: $(OBJ_FILES_NO_MAIN)
-	$(COMPILER) -o $(BUILD_DIR)/$(TEST_OUT) $(OBJ_FILES_NO_MAIN) $(DEFINES) $(INCLUDE_FLAGS) $(LINKER_FLAGS) $(OPS)
+	$(COMPILER) -o $(BUILD_DIR)/$(TEST_OUT) $(OBJ_FILES_NO_MAIN) $(DEFINES) $(INCLUDE_FLAGS)  $(LINKER_FLAGS) $(OPS)
 
 
 $(BUILD_DIR)/src/%.o: $(SOURCE_DIR)/%.c
@@ -56,7 +56,7 @@ $(BUILD_DIR)/libs/%.o: $(LIBS_SRC)/%.c
 
 $(BUILD_DIR)/tests/%.o: $(TEST_SRC)/%.c
 	mkdir -p $(@D)
-	$(COMPILER) $(OPS) -c $< -o $@ $(INCLUDE_FLAGS)
+	$(COMPILER) $(OPS) -c $< -o $@ $(INCLUDE_FLAGS) -I$(SOURCE_DIR)
 
 clean:
 	rm -rf $(BUILD_DIR)/*

@@ -1,6 +1,6 @@
 #include "ecs.h"
 #include "containers/dqueue.h"
-
+#include "logger.h"
 
 
 
@@ -44,6 +44,7 @@ void ecs_destroy(){
     dqueue_free(store.inactive_entities);
     darray_free(store.components);    
     darray_free(store.query_res);        
+    store.entity_allocator = 0;
 }
 
 ecs_entity ecs_create_entity(){
@@ -80,10 +81,22 @@ void _ecs_remove_components(ecs_entity e, component_mask mask){
     ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
     cs->arr = (cs->arr &(~mask));
 }
+void _ecs_add_components(ecs_entity e, component_mask mask){
+
+    ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
+    if(cs == nullptr){
+        LOG_INFO("nullptr  %i", e);    
+    }
+
+    cs->arr = (cs->arr | mask);
+
+}
 
 void ecs_destroy_entity(ecs_entity e){
     ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
-    cs->arr = 0;
+    
+    cs->arr = COMPONENT_MASK_OF(unactive);
+
     dqueue_push_back(store.inactive_entities, e);
 }
 
