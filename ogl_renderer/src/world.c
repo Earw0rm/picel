@@ -36,10 +36,11 @@ void world_init(){
 
         
     store.main_camera = camera_init(
-        v3f(0, 0, 0),
-        v3f(0, 0, -3.0),
+        v3f(0, 5.0, 0),
+        v3f(0, 0, -3.0f),
         v3f(0, 1.0, 0)
     );
+
     if(store.main_camera == nullptr){
         exit(-1);
     }

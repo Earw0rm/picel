@@ -8,6 +8,11 @@ void render_system_render(ecs ecs, window w, camera main_camera){
     float aspect_ratio = win_get_aspect_ratio(w);
     matrix4f projection = mat4f_projection(20.0f, aspect_ratio, 1, 100);
 
+    LOG_INFO("view matrix");
+    log_matrix4f(view);
+
+    LOG_INFO("projection matrix");
+    log_matrix4f(projection);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -33,7 +38,7 @@ void render_system_render(ecs ecs, window w, camera main_camera){
 
     
 
-
+        // TODO there is error 
         matrix4f model = mat4f_id(1);
         model = mat4f_scale(model, ctrans->scale.x, ctrans->scale.y, ctrans->scale.z);
         model = mat4f_rotate(model, ctrans->rotation.x, ctrans->rotation.y, ctrans->rotation.z);
@@ -43,6 +48,9 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, projection.m);
         glUniformMatrix4fv(model_loc, 1, GL_FALSE, model.m);
 
+
+        LOG_INFO("model matrix");
+        log_matrix4f(model);
 
 
         glDrawElements(GL_TRIANGLES, cmesh->vectex_count, GL_UNSIGNED_INT, 0 /*last parameter deprecated*/);
