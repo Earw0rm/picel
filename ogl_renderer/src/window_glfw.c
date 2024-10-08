@@ -1,3 +1,5 @@
+#ifdef WINDOW_GLFW
+
 #include "window.h"
 #include "logger.h"
 #include "uvn_camera.h"
@@ -5,6 +7,8 @@
 #include "event_system.h"
 #include <stdlib.h>
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 static struct window{
     const char* title;
@@ -24,10 +28,6 @@ static struct window{
 
 
 
-[[gnu::unused]]static void
-send_mouse_delta(){
-    
-}
 
 static void 
 resize_callback(GLFWwindow* window, int32_t width, int32_t height){
@@ -46,10 +46,8 @@ static void
 mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
 
     if(!win.is_delta_initialized){
-        LOG_INFO("Initializing  %f ypos %f", xpos, ypos);
         win.last_xpos = xpos;
         win.last_ypos = ypos;
-
         win.is_delta_initialized = true;
         return;
     }
@@ -71,12 +69,6 @@ process_camera_move(){
     uint32_t key_s = glfwGetKey(win.window, GLFW_KEY_S);
     uint32_t key_a = glfwGetKey(win.window, GLFW_KEY_A);
     uint32_t key_d = glfwGetKey(win.window, GLFW_KEY_D);
-
-    // uint32_t key_up = glfwGetKey(win.window, GLFW_KEY_UP);
-    // uint32_t key_down = glfwGetKey(win.window, GLFW_KEY_DOWN);
-    // uint32_t key_left = glfwGetKey(win.window, GLFW_KEY_LEFT);
-    // uint32_t key_right = glfwGetKey(win.window, GLFW_KEY_RIGHT);
-
 
     if(key_w == GLFW_PRESS){
         event_context ctx;
@@ -127,7 +119,6 @@ win_init(const char* title, uint32_t height, uint32_t width){
     }
 
     glEnable(GL_DEPTH_TEST);
-
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
@@ -200,3 +191,4 @@ win_get_aspect_ratio(){
     return (((float) win.width) / ((float)win.height));
 }
 
+#endif 

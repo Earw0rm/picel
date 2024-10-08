@@ -16,6 +16,12 @@ layout (location = 1) in vec4 inColors;
 // b - bool 
 // N - 1, 2, 3, 4 (vector size)
 uniform mat4 mvp;
+
+//TODO
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 out vec4 vertexColor;
 
 

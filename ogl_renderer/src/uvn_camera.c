@@ -1,7 +1,7 @@
 #include "uvn_camera.h"
 #include <stdlib.h>
 #include "memory.h"
-#include "math.h"
+#include "picel_math.h"
 #include "event_system.h"
 #include <GLFW/glfw3.h>
 
@@ -37,7 +37,7 @@ struct camera_mat{
 
 
 
-[[gnu::unused]]static bool // TODO refactor
+static bool // TODO refactor
 on_mouse_pos_changed(event_code code, 
              void* sender,
              void* listener_inst,
@@ -65,15 +65,8 @@ on_mouse_pos_changed(event_code code,
         .z = sinf(DEGREE2RADIANS(c->yaw)) * cosf(DEGREE2RADIANS(c->pitch)),
     };
 
-
-    LOG_INFO("direction before update x:%f y:%f z:%f", 
-    c->direction.x, c->direction.y, c->direction.z);
-
     // after updating direction we need to consyst of right and up vector
     c->direction = vec3f_normalize(direction);
-
-    LOG_INFO("direction before update x:%f y:%f z:%f", 
-    c->direction.x, c->direction.y, c->direction.z);
 
     c->right = vec3f_normalize(vec3f_cross(c->world_space_up, c->direction));
     c->up = vec3f_cross(c->direction, c->right);
@@ -160,10 +153,6 @@ void camera_destroy(camera camera){
 
 matrix4f camera_get_view(camera c){
 
-    // if(counter < 10){
-    //     LOG_INFO(" Picth %f Yawl %f", c->pitch, c->yaw);
-    // }
-    // ++counter;
 
 
     matrix4f a = mat4f_id(1);

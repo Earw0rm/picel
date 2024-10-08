@@ -1,3 +1,8 @@
+DEFINES = -DWINDOW_GLFW
+
+
+
+
 BUILD_DIR = ./build
 SOURCE_DIR = ./src
 COMPILER ?= clang

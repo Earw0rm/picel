@@ -4,8 +4,10 @@
 
 typedef struct shader{
     GLint program;
-    // initialized after shader_use();
-    GLint mvp_loc;
+
+    GLint uniform_location_model;
+    GLint uniform_location_view;
+    GLint uniform_location_projection;
 
     bool is_initialized;
 } shader;
@@ -13,7 +15,7 @@ typedef struct shader{
 
 enum shader_status{
     SHADER_STATUS_BAD_IS_UNINITIALIZED       = -13,
-    SHADER_STATUS_BAD_MVP_UNIFORM            = -12,    
+    SHADER_STATUS_BAD_UNIFORM            = -12,    
     SHADER_STATUS_BAD_PROGRAM_VALIDATION     = -11,    
     SHADER_STATUS_BAD_PROGRAM_LINKAGE        = -10,    
     SHADER_STATUS_BAD_PROGRAM_CREATE         = -9,
@@ -33,10 +35,11 @@ int8_t shader_init(const char* vert_path,
                    const char* frag_path,
                    shader* sp);
 
-void shader_shutdown(shader* sp);
+void shader_destroy(shader* sp);
 
-uint8_t shader_use(shader* sp);
 
-void write_mvp();
+
+
+
 
 #endif 

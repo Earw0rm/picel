@@ -1,11 +1,27 @@
 #ifndef _MESH_H_
 #define _MESH_H_
+#include <glad/glad.h>
 
-typedef struct mesh_data* mesh;
 
+typedef struct mesh{
+    GLuint vbo;
+    GLuint vao;
+    GLuint ebo;
 
-mesh createMesh(const char* filepath);
-void destroyMesh(mesh mesh);
+    uint64_t vertices_num;
+    float* vertices;
+
+    uint64_t indexes_num;
+    GLuint* indexes;
+} mesh;
+
+enum mesh_status{
+    MESH_STATUS_OK                         =  0,
+    MESH_STATUS_MAX_VALUE
+};
+
+uint8_t mesh_init(const char* filepath, mesh* m);
+void mesh_destroy(mesh* m);
 
 
 #endif 

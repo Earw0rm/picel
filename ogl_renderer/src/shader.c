@@ -6,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
+
 #define INFO_BUFSZ 0x1000
 
 
@@ -173,13 +174,32 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
         goto shader_cleanup;
     }    
 
+
+
     //uniform need to be called after program link
-    sp->mvp_loc = glGetUniformLocation(sp->program, "mvp");
-    if(sp->mvp_loc == -1){
-        LOG_FATAL("cannot get uniform with name mvp");
-        res = SHADER_STATUS_BAD_MVP_UNIFORM;
+    sp->uniform_location_model = glGetUniformLocation(sp->program, "model");
+    if(sp->uniform_location_model == -1){
+        LOG_FATAL("Cannot find uniform with name model. Shader must include uniform with this name");
+        res = SHADER_STATUS_BAD_UNIFORM;
         goto shader_cleanup;
     }
+
+    //uniform need to be called after program link
+    sp->uniform_location_view = glGetUniformLocation(sp->program, "view");
+    if(sp->uniform_location_view == -1){
+        LOG_FATAL("Cannot find uniform with name view. Shader must include uniform with this name");
+        res = SHADER_STATUS_BAD_UNIFORM;
+        goto shader_cleanup;
+    }
+
+    //uniform need to be called after program link
+    sp->uniform_location_projection = glGetUniformLocation(sp->program, "projection");
+    if(sp->uniform_location_projection == -1){
+        LOG_FATAL("Cannot find uniform with name projection. Shader must include uniform with this name");
+        res = SHADER_STATUS_BAD_UNIFORM;
+        goto shader_cleanup;
+    }    
+
 
     sp->is_initialized = true;
 
@@ -210,17 +230,8 @@ void shader_shutdown(shader* sp){
     glDeleteProgram(sp->program);
     sp->is_initialized = false;
     sp->program =  0;
-    sp->mvp_loc = -1;
+    sp->uniform_location_model = -1;
+    sp->uniform_location_view = -1;
+    sp->uniform_location_projection = -1;    
 }
 
-uint8_t shader_use(shader* sp){
-    if(!sp->is_initialized){
-        return SHADER_STATUS_BAD_IS_UNINITIALIZED;
-    }
-
-    LOG_DEBUG("Use shader with program_id: %i", sp->program);   
-
-
-    glUseProgram(sp->program);
-    return SHADER_STATUS_OK;
-}

@@ -1,13 +1,12 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include <stdint.h>
 #include <stdbool.h>
 #include "math_struct.h"
 
+typedef struct window_mat* window;
 
 enum WINDOW_STATUS{
     BAD_DOUBLE_INITIALIZATION = -4,

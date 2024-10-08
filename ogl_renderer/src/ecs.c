@@ -1,7 +1,7 @@
 #include "ecs.h"
 #include "containers/dqueue.h"
 #include "logger.h"
-
+#include "stdlib.h"
 
 
 
@@ -24,39 +24,37 @@
  * It is expected that alignment will be at the level of component structures that are registered 
  * in the "store" by calling ecs_init.
  */
-static struct {
+struct ecs_impl{
     uint64_t entity_allocator;
     dqueue inactive_entities;
     darray components;
     darray query_res;
-} store;
+};
 
-
-
-
-
-void ecs_init(){
-    store.inactive_entities = dqueue_alloc(int64_t);
-    store.components = darray_alloc(ecs_component_set);
-    store.query_res = darray_alloc(ecs_entity);
-
+ecs ecs_init(){
+    ecs res = malloc(sizeof(struct ecs_impl));
+    res->inactive_entities = dqueue_alloc(int64_t);
+    res->components = darray_alloc(ecs_component_set);
+    res->query_res = darray_alloc(ecs_entity);
+    res->entity_allocator = 0;
+    return res;
 }
-void ecs_destroy(){
-    dqueue_free(store.inactive_entities);
-    darray_free(store.components);    
-    darray_free(store.query_res);        
-    store.entity_allocator = 0;
+void ecs_destroy(ecs ecs){
+    dqueue_free(ecs->inactive_entities);
+    darray_free(ecs->components);    
+    darray_free(ecs->query_res);        
+    ecs->entity_allocator = 0;
 }
 
-ecs_entity ecs_create_entity(){
+ecs_entity ecs_create_entity(ecs ecs){
     ecs_entity* pres;
-    if((pres = dqueue_pop_front(store.inactive_entities)) != nullptr){
+    if((pres = dqueue_pop_front(ecs->inactive_entities)) != nullptr){
         return *pres;
     }
 
-    ecs_entity res = store.entity_allocator++; 
+    ecs_entity res = ecs->entity_allocator++; 
     ecs_component_set zero_set = {0};
-    darray_push_back(store.components, zero_set);
+    darray_push_back(ecs->components, zero_set);
 
     return res;
 }
@@ -68,42 +66,41 @@ ecs_entity ecs_create_entity(){
  * @param component_id component_id
  * @return (void*) pointer to the component
  */
-void* _ecs_get_component(ecs_entity e, component_id id){
-    ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
+void* _ecs_get_component(ecs ecs, ecs_entity e, component_id id){
+    ecs_component_set* cs = (ecs_component_set* ) darray_at(ecs->components, e);
     return (void*)((char*)cs + id);
 }
 
-active_components_array ecs_has_components(ecs_entity e){
-    ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
-
+active_components_array ecs_has_components(ecs ecs, ecs_entity e){
+    ecs_component_set* cs = (ecs_component_set* ) darray_at(ecs->components, e);
     return cs->arr;
 }
 
-void _ecs_remove_components(ecs_entity e, component_mask mask){
-    ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
+void _ecs_remove_components(ecs ecs, ecs_entity e, component_mask mask){
+    ecs_component_set* cs = (ecs_component_set* ) darray_at(ecs->components, e);
     cs->arr = (cs->arr &(~mask));
 }
 
-void _ecs_add_components(ecs_entity e, component_mask mask){
-    ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
+void _ecs_add_components(ecs ecs, ecs_entity e, component_mask mask){
+    ecs_component_set* cs = (ecs_component_set* ) darray_at(ecs->components, e);
     cs->arr = (cs->arr | mask);
 
 }
 
-void ecs_destroy_entity(ecs_entity e){
-    ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, e);
+void ecs_destroy_entity(ecs ecs, ecs_entity e){
+    ecs_component_set* cs = (ecs_component_set* ) darray_at(ecs->components, e);
     cs->arr = COMPONENT_MASK_OF(unactive); 
-    dqueue_push_back(store.inactive_entities, e);
+    dqueue_push_back(ecs->inactive_entities, e);
 }
 
 // It is expected that the mask will contain that the component is active if need
-darray _ecs_query(component_mask mask){
-    darray_clear(store.query_res);
-    for(uint64_t i = 0; i < darray_lenght(store.components); ++i){
-        ecs_component_set* cs = (ecs_component_set* ) darray_at(store.components, i);
+darray _ecs_query(ecs ecs, component_mask mask){
+    darray_clear(ecs->query_res);
+    for(uint64_t i = 0; i < darray_lenght(ecs->components); ++i){
+        ecs_component_set* cs = (ecs_component_set* ) darray_at(ecs->components, i);
         if((cs->arr & mask) == mask){
-            darray_push_back(store.query_res, i);
+            darray_push_back(ecs->query_res, i);
         }
     }
-    return store.query_res;
+    return ecs->query_res;
 }

@@ -1,14 +1,17 @@
 #ifndef _COMPONENTS_H_
 #define _COMPONENTS_H_
 
+#include "math_struct.h"
+#include <glad/glad.h>
+
 #include <stdint.h>
 #include <stddef.h>
 
 #define LIST_OF_COMPONENTS \
-    X(component_move) \
+    X(component_transform) \
     X(component_mesh) \
-
-
+    X(component_material) \
+    X(component_renderable) \
 
 typedef uint64_t ecs_entity;
 typedef int64_t active_components_array;
@@ -16,14 +19,29 @@ typedef int64_t active_components_array;
 typedef uint64_t component_id;
 
 
-typedef struct component_move{
-    uint64_t a;
-    char aa;
-}component_move;
+typedef struct component_transform{
+    vector3f position;
+    vector3f rotation;
+    vector3f scale;    
+} component_transform;
 
 typedef struct component_mesh{
-    uint64_t b;
+    GLuint vao;
+    GLuint vbo;
+    GLuint ebo;
+    size_t vectex_count;
 }component_mesh;
+
+typedef struct component_material{
+    GLuint shader_program;
+    GLuint* textures; 
+    size_t texture_count;
+} component_material;
+
+//component marker
+typedef struct component_renderable{
+
+}component_renderable;
 
 
 

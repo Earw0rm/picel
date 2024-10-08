@@ -49,7 +49,10 @@
         "*.inc": "c",
         "random": "c",
         "numbers": "c",
-        "logger.h": "c"
+        "logger.h": "c",
+        "stb_image.h": "c",
+        "window.h": "c",
+        "ecs.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

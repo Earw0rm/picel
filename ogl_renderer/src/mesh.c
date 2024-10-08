@@ -2,24 +2,90 @@
 #include <glad/glad.h>
 #include <stddef.h>
 
-[[gnu::unused]]static size_t number_of_meshes_used    = 0;
-[[gnu::unused]]static size_t number_of_meshes_created = 0;
 
-struct mesh_data{
-    GLint vbo;
-    GLint vao;
-    GLint ebo;
+#define CUBE_VERTICES_NUM (8 * 7)
+#define CUBE_INDICES_NUM  (12 * 3)
+static float cube_vertices[CUBE_VERTICES_NUM] = {
+    0.5f,  0.5f,  0.5f,        1.0f, 0.0f, 0.0f, 1.0f,
+   -0.5f,  0.5f, -0.5f,        0.0f, 1.0f, 0.0f, 1.0f,
+   -0.5f,  0.5f,  0.5f,        0.0f, 0.0f, 1.0f, 1.0f,
+    0.5f, -0.5f, -0.5f,        0.5f, 0.5f, 0.5f, 1.0f,
 
-    uint64_t vertices_num;
-    float* vertices;
-
-    uint64_t indexes_num;
-    uint64_t* indexes;
+   -0.5f, -0.5f, -0.5f,        0.8f, 0.0f, 0.0f, 1.0f,
+    0.5f,  0.5f, -0.5f,        0.0f, 0.8f, 0.0f, 1.0f,
+    0.5f, -0.5f,  0.5f,        0.0f, 0.0f, 0.8f, 1.0f,
+   -0.5f, -0.5f,  0.5f,        0.2f, 0.2f, 0.2f, 1.0f
 };
 
-mesh createMesh(const char* filepath){
-    return nullptr;
+GLuint cube_indices[CUBE_INDICES_NUM] ={
+    0, 1, 2,
+    1, 3, 4,
+    5, 6, 3,
+    7, 3, 6,
+    2, 4, 7,
+    0, 7, 6,
+    0, 5, 1,
+    1, 5, 3,
+    5, 0, 6, 
+    7, 4, 3,
+    2, 1, 4,
+    0, 2, 7 
+};
+
+
+
+// TODO implement reading from disk
+// TODO now all meshes are on the gpu all the time. Refactor
+uint8_t mesh_init(const char* filepath, mesh* m){
+    uint8_t mesh_status = MESH_STATUS_OK;
+
+    glGenVertexArrays(1, &m->vao);
+    glBindVertexArray(m->vao);
+
+    glGenBuffers(1, &m->ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ebo);    
+    // load data from memory to GPU
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, CUBE_INDICES_NUM * sizeof(GLuint), cube_indices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &m->vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m->vbo);    
+    // load data from memory to GPU
+    glBufferData(GL_ARRAY_BUFFER, CUBE_VERTICES_NUM * sizeof(float), cube_vertices, GL_STATIC_DRAW);
+
+
+    // glVertexAttribPointer call work relative last binded buffer
+    glVertexAttribPointer( /*lenght = 3 (3 vertises). Stride => vertices + colors*/
+            /*layout (location = 0)*/ 0,
+            /*how many data for vertices*/3,
+            GL_FLOAT,
+            GL_FALSE,
+            7 * sizeof(float), // stride
+            /*offset inside VBO*/(void*)0
+    );
+    glVertexAttribPointer( 
+            /*layout (location = 0)*/ 1,
+            /*how many data for colors*/4,
+            GL_FLOAT,
+            GL_FALSE,
+            7 * sizeof(float),
+            /*offset inside VBO*/(void*)((3 * sizeof(float)))
+    );
+
+    // glEnableVertexAttribArray(0);
+    // glEnableVertexAttribArray(1);
+
+    m->vertices_num = CUBE_VERTICES_NUM ;
+    m->vertices = cube_vertices;
+    m->indexes_num = CUBE_INDICES_NUM;
+    m->indexes = cube_indices;
+
+    return mesh_status;
 }
-void destroyMesh(mesh mesh){
-    //TODO implement this
+
+
+
+void mesh_destroy(mesh* m){
+    glDeleteBuffers(1, &m->vbo);
+    glDeleteBuffers(1, &m->vao);
+    glDeleteBuffers(1, &m->ebo);        
 }
