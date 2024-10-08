@@ -10,21 +10,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-static struct window{
+struct window_impl{
     const char* title;
     uint32_t height;
     uint32_t width;
     GLFWwindow* window;
-    bool is_initialized;
-
-
 
 
     // for sending delta to the camera 
     bool is_delta_initialized;
     double last_xpos;
     double last_ypos;
-} win;
+};
 
 
 
@@ -44,31 +41,19 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
 
 static void
 mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
-
-    if(!win.is_delta_initialized){
-        win.last_xpos = xpos;
-        win.last_ypos = ypos;
-        win.is_delta_initialized = true;
-        return;
-    }
-
-    double delta_x = (xpos - win.last_xpos);
-    double delta_y = (ypos - win.last_ypos);
-    win.last_xpos = xpos;
-    win.last_ypos = ypos;
-
     event_context ctx;
-    ctx.data.d64[0] = delta_x;
-    ctx.data.d64[1] = delta_y;
+    ctx.data.d64[0] = xpos;
+    ctx.data.d64[1] = ypos;
+
     event_system_fire(EVENT_CODE_MOUSE_MOVED, nullptr, ctx);
 }
 
 static void 
-process_camera_move(){
-    uint32_t key_w = glfwGetKey(win.window, GLFW_KEY_W);
-    uint32_t key_s = glfwGetKey(win.window, GLFW_KEY_S);
-    uint32_t key_a = glfwGetKey(win.window, GLFW_KEY_A);
-    uint32_t key_d = glfwGetKey(win.window, GLFW_KEY_D);
+process_camera_move(window win){
+    uint32_t key_w = glfwGetKey(win->window, GLFW_KEY_W);
+    uint32_t key_s = glfwGetKey(win->window, GLFW_KEY_S);
+    uint32_t key_a = glfwGetKey(win->window, GLFW_KEY_A);
+    uint32_t key_d = glfwGetKey(win->window, GLFW_KEY_D);
 
     if(key_w == GLFW_PRESS){
         event_context ctx;
@@ -94,28 +79,28 @@ process_camera_move(){
 }
 
 
-uint8_t 
+window
 win_init(const char* title, uint32_t height, uint32_t width){
-    if(win.is_initialized){
-        return BAD_DOUBLE_INITIALIZATION;
-    }
+
+    window win = malloc(sizeof(struct window_impl));;
+    
     if(!glfwInit()){
         LOG_FATAL("cannot initialize glfw");
-        return BAD_GLFW_INIT;
+        goto ret_error;
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if((win.window = glfwCreateWindow(width, height, title, nullptr, nullptr)) == nullptr){
+    if((win->window = glfwCreateWindow(width, height, title, nullptr, nullptr)) == nullptr){
         LOG_FATAL("cannot create glfw window");
-        return BAD_GLFW_WINDOW_CREATE;
+        goto ret_error;
     }
 
-    glfwMakeContextCurrent(win.window);
+    glfwMakeContextCurrent(win->window);
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-         LOG_FATAL("cannot load glad");
-         return BAD_GLAD_LOAD;
+        LOG_FATAL("cannot load glad");
+        goto ret_error;
     }
 
     glEnable(GL_DEPTH_TEST);
@@ -123,10 +108,11 @@ win_init(const char* title, uint32_t height, uint32_t width){
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
 
-    glfwSetFramebufferSizeCallback(win.window, resize_callback);
-    glfwSetKeyCallback(win.window, key_input_callback);
-    win.height = height;
-    win.width  = width;
+    glfwSetFramebufferSizeCallback(win->window, resize_callback);
+    glfwSetKeyCallback(win->window, key_input_callback);
+ 
+    win->height = height;
+    win->width  = width;
 
     /**
      * Hide the cursor and capture it.
@@ -135,60 +121,67 @@ win_init(const char* title, uint32_t height, uint32_t width){
      * (unless the application loses focus or quits). We can do
      * this with one simple configuration call:
      */
-    glfwSetInputMode(win.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPosCallback(win.window, mouse_callback);  
+    glfwSetInputMode(win->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(win->window, mouse_callback);  
 
-    win.is_initialized = true;
-    win.is_delta_initialized = false;
+
+    win->is_delta_initialized = false;
     LOG_INFO("Window initialized");
-    return OK;
+
+
+
+    return win;
+
+ret_error:
+    free(win);
+    return nullptr;    
 }
 
 void 
-win_destroy(){
-    if(win.window == nullptr){
+win_destroy(window win){
+    if(win->window == nullptr){
         LOG_DEBUG("cannot destroy nullptr window");
         return;
     }
-    if(!win.is_initialized){
-        LOG_DEBUG("cannot destroy not initialized window");
-        return;        
-    }
-
-    glfwDestroyWindow(win.window);
+    glfwDestroyWindow(win->window);
     glfwTerminate();
 }
 
 bool
-win_should_close(){
-    if(!win.is_initialized){
-        LOG_DEBUG("calling win_should_close without initialization");
+win_should_close(window win){
+    if(win == nullptr){
+        LOG_DEBUG("calling win_should_close on nullptr window");
         return true;
     }
-    return glfwWindowShouldClose(win.window);
+    return glfwWindowShouldClose(win->window);
 }
 
 void 
-win_swap_buffers(){
-    if(!win.is_initialized) {
-        LOG_DEBUG("calling swapBuffers without initialization");
+win_swap_buffers(window win){
+    if(win == nullptr) {
+        LOG_DEBUG("calling swapBuffers on nullptr window");
         return;
     }
-    glfwSwapBuffers(win.window);
+    glfwSwapBuffers(win->window);
 }
 void
-win_poll_events(){
-    if(!win.is_initialized){
-        LOG_DEBUG("calling pollEvents without initialization");
+win_poll_events(window win){
+    if(win == nullptr){
+        LOG_DEBUG("calling win_poll_events on nullptr window");
         return;
     }
+
     glfwPollEvents();
-    process_camera_move();
+    process_camera_move(win);
 }
 
 float
-win_get_aspect_ratio(){
-    return (((float) win.width) / ((float)win.height));
+win_get_aspect_ratio(window win){
+    if(win == nullptr){
+        LOG_DEBUG("calling win_get_aspect_ratio on nullptr window");
+        return 0;
+    }
+    return (((float) win->width) / ((float)win->height));
 }
 
 #endif 

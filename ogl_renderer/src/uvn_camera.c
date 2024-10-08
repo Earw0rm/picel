@@ -33,6 +33,12 @@ struct camera_mat{
     // float_t roll;  // -> around z axis
 
     float mouse_sensitivity;    
+
+    // from event bus
+    float last_xpos;
+    float last_ypos;
+    bool last_position_is_initialized;
+
 };
 
 
@@ -44,9 +50,18 @@ on_mouse_pos_changed(event_code code,
              event_context data){
     camera c = (camera) listener_inst;
 
+    if(!c->last_position_is_initialized){
+        c->last_xpos = data.data.d64[0];
+        c->last_ypos = data.data.d64[1];
+        c->last_position_is_initialized = true;
+        return false;
+    }
 
-    double delta_x = data.data.d64[0];
-    double delta_y = data.data.d64[1];            
+    double delta_x = (c->last_xpos - data.data.d64[0]);
+    double delta_y = (c->last_ypos - data.data.d64[1]);
+    
+    c->last_xpos = data.data.d64[0];
+    c->last_ypos = data.data.d64[1];
 
     c->yaw   += c->mouse_sensitivity * (delta_x);
     c->pitch += c->mouse_sensitivity * (delta_y); // sinse y-coordinates range from bottom to top we need to invert this?
@@ -119,11 +134,13 @@ camera camera_init(vector3f camera_position,
     camera res = malloc(sizeof(struct camera_mat));
     //TODO crunch
     if(!event_system_register(EVENT_CODE_KEY_PRESSED, res, on_key_press)){
+        LOG_FATAL("cannot register camera to the event bus");
         free(res);
         return nullptr;
     }
     // // TODO crunch again
     if(!event_system_register(EVENT_CODE_MOUSE_MOVED, res, on_mouse_pos_changed)){
+        LOG_FATAL("cannot register camera to the event bus");
         free(res);
         return nullptr;
     }
@@ -152,8 +169,6 @@ void camera_destroy(camera camera){
 }
 
 matrix4f camera_get_view(camera c){
-
-
 
     matrix4f a = mat4f_id(1);
     matrix4f b = mat4f_id(1);

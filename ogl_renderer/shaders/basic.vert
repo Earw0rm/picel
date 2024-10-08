@@ -15,9 +15,7 @@ layout (location = 1) in vec4 inColors;
 // d - double
 // b - bool 
 // N - 1, 2, 3, 4 (vector size)
-uniform mat4 mvp;
 
-//TODO
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -27,7 +25,6 @@ out vec4 vertexColor;
 
 
 void main(){
-
-    gl_Position = mvp * vec4(in_pos, 1.0);
+    gl_Position = projection * view * model * vec4(in_pos, 1.0);
     vertexColor = inColors;       
 }

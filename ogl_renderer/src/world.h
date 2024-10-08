@@ -17,5 +17,5 @@ ecs world_get_ecs();
 camera world_get_main_camera();
 shader world_get_basic_shader();
 mesh world_get_basic_mesh();
-
+window world_get_main_window();
 #endif 

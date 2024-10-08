@@ -175,24 +175,21 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
     }    
 
 
-
-    //uniform need to be called after program link
+    // these 3 uniforms should be in any custom shader.
+    // We don't use the location outside of this class. They are just needed for testing.
+    // uniform need to be called after program link
     sp->uniform_location_model = glGetUniformLocation(sp->program, "model");
     if(sp->uniform_location_model == -1){
         LOG_FATAL("Cannot find uniform with name model. Shader must include uniform with this name");
         res = SHADER_STATUS_BAD_UNIFORM;
         goto shader_cleanup;
     }
-
-    //uniform need to be called after program link
     sp->uniform_location_view = glGetUniformLocation(sp->program, "view");
     if(sp->uniform_location_view == -1){
         LOG_FATAL("Cannot find uniform with name view. Shader must include uniform with this name");
         res = SHADER_STATUS_BAD_UNIFORM;
         goto shader_cleanup;
     }
-
-    //uniform need to be called after program link
     sp->uniform_location_projection = glGetUniformLocation(sp->program, "projection");
     if(sp->uniform_location_projection == -1){
         LOG_FATAL("Cannot find uniform with name projection. Shader must include uniform with this name");
@@ -226,7 +223,7 @@ shader_cleanup:
     return res;
 }
 
-void shader_shutdown(shader* sp){
+void shader_destroy(shader* sp){
     glDeleteProgram(sp->program);
     sp->is_initialized = false;
     sp->program =  0;

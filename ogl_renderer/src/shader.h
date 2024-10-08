@@ -35,6 +35,7 @@ int8_t shader_init(const char* vert_path,
                    const char* frag_path,
                    shader* sp);
 
+
 void shader_destroy(shader* sp);
 
 

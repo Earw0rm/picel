@@ -52,7 +52,9 @@
         "logger.h": "c",
         "stb_image.h": "c",
         "window.h": "c",
-        "ecs.h": "c"
+        "ecs.h": "c",
+        "world.h": "c",
+        "picel_math.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

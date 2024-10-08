@@ -1,7 +1,11 @@
-// #ifndef _RENDER_SYSTEM_H_
-// #define _RENDER_SYSTEM_H_
+#ifndef _RENDER_SYSTEM_H_
+#define _RENDER_SYSTEM_H_
 
-// // need access to resource manager
-// void render_system_render();
+#include "ecs.h"
+#include "world.h"
+#include "window.h"
 
-// #endif 
+
+void render_system_render(ecs ecs, window w, camera main_camera);
+
+#endif 
