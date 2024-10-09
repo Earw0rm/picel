@@ -54,7 +54,8 @@
         "window.h": "c",
         "ecs.h": "c",
         "world.h": "c",
-        "picel_math.h": "c"
+        "picel_math.h": "c",
+        "texture.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

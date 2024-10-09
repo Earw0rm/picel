@@ -34,8 +34,7 @@ typedef struct component_mesh{
 
 typedef struct component_material{
     GLuint shader_program;
-    GLuint* textures; 
-    size_t texture_count;
+    GLuint texture_obj; 
 } component_material;
 
 //component marker

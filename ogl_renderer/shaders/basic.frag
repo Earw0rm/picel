@@ -1,11 +1,14 @@
 #version 330 core
 
 
-in  vec4 vertexColor;
-out vec4 outColor;
+in vec2 tex_coord;
 
+out vec4 out_color;
+uniform sampler2D g_sampler;
 
 
 void main(){
-    outColor = vertexColor;
+
+                //sample texture color using g_sampler
+    out_color = texture2D(g_sampler, tex_coord);
 }

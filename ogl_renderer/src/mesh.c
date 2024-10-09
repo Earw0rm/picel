@@ -3,18 +3,19 @@
 #include <stddef.h>
 
 
-#define CUBE_VERTICES_NUM (8 * 7)
+#define CUBE_VERTICES_NUM (8 * 5)
 #define CUBE_INDICES_NUM  (12 * 3)
 static float cube_vertices[CUBE_VERTICES_NUM] = {
-    0.5f,  0.5f,  0.5f,        1.0f, 0.0f, 0.0f, 1.0f,
-   -0.5f,  0.5f, -0.5f,        0.0f, 1.0f, 0.0f, 1.0f,
-   -0.5f,  0.5f,  0.5f,        0.0f, 0.0f, 1.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,        0.5f, 0.5f, 0.5f, 1.0f,
+                            /*texture coordinates*/
+    0.5f,  0.5f,  0.5f,        0.0f, 0.0f, 
+   -0.5f,  0.5f, -0.5f,        0.0f, 1.0f, 
+   -0.5f,  0.5f,  0.5f,        1.0f, 0.0f, 
+    0.5f, -0.5f, -0.5f,        1.0f, 1.0f, 
 
-   -0.5f, -0.5f, -0.5f,        0.8f, 0.0f, 0.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,        0.0f, 0.8f, 0.0f, 1.0f,
-    0.5f, -0.5f,  0.5f,        0.0f, 0.0f, 0.8f, 1.0f,
-   -0.5f, -0.5f,  0.5f,        0.2f, 0.2f, 0.2f, 1.0f
+   -0.5f, -0.5f, -0.5f,        0.0f, 0.0f, 
+    0.5f,  0.5f, -0.5f,        0.0f, 1.0f, 
+    0.5f, -0.5f,  0.5f,        1.0f, 0.0f, 
+   -0.5f, -0.5f,  0.5f,        1.0f, 1.0f, 
 };
 
 GLuint cube_indices[CUBE_INDICES_NUM] ={
@@ -54,26 +55,25 @@ uint8_t mesh_init(const char* filepath, mesh* m){
 
 
     // glVertexAttribPointer call work relative last binded buffer
-    glVertexAttribPointer( /*lenght = 3 (3 vertises). Stride => vertices + colors*/
+    glVertexAttribPointer( /*lenght = 3 (3 vertises). Stride => vertices + textures*/
             /*layout (location = 0)*/ 0,
             /*how many data for vertices*/3,
             GL_FLOAT,
             GL_FALSE,
-            7 * sizeof(float), // stride
+            5 * sizeof(float), // stride
             /*offset inside VBO*/(void*)0
     );
+
+    // texture vertex attribute pointer
     glVertexAttribPointer( 
             /*layout (location = 0)*/ 1,
-            /*how many data for colors*/4,
+            /*how many data for textures*/2,
             GL_FLOAT,
             GL_FALSE,
-            7 * sizeof(float),
+            5 * sizeof(float),
             /*offset inside VBO*/(void*)((3 * sizeof(float)))
     );
-
-    // glEnableVertexAttribArray(0);
-    // glEnableVertexAttribArray(1);
-
+    
     m->vertices_num = CUBE_VERTICES_NUM ;
     m->vertices = cube_vertices;
     m->indexes_num = CUBE_INDICES_NUM;

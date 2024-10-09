@@ -12,7 +12,7 @@ TEST_SRC = ./tests
 
 OPS = -g -Wvarargs -Wall -Werror -std=c23
 INCLUDE_FLAGS = -I./include -I./libs/include -I../yasyc/include
-LINKER_FLAGS = -L$(YASYC_PATH) -Wl,-rpath,$(YASYC_PATH)  -lm -lc -lglfw -lGL -ldl -lpthread -lX11 -lXrandr -lXi -lyasyc 
+LINKER_FLAGS = -L$(YASYC_PATH) -Wl,-rpath,$(YASYC_PATH)  -lm -lc -lglfw -lGL -ldl -lpthread -lX11 -lXrandr -lXi -lyasyc  
 
 OUT = renderer
 TEST_OUT = renderer_tests

@@ -8,7 +8,7 @@ typedef struct shader{
     GLint uniform_location_model;
     GLint uniform_location_view;
     GLint uniform_location_projection;
-
+    GLint uniform_location_g_sampler;
     bool is_initialized;
 } shader;
 

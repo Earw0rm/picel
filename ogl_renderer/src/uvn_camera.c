@@ -59,7 +59,8 @@ on_mouse_pos_changed(event_code code,
 
     double delta_x = (c->last_xpos - data.data.d64[0]);
     double delta_y = (c->last_ypos - data.data.d64[1]);
-    
+
+
     c->last_xpos = data.data.d64[0];
     c->last_ypos = data.data.d64[1];
 
@@ -73,6 +74,7 @@ on_mouse_pos_changed(event_code code,
     if(c->pitch < -89.0f){
         c->pitch = -89.0f;
     }
+
 
     vector3f direction = {
         .x = cosf(DEGREE2RADIANS(c->yaw)) * cosf(DEGREE2RADIANS(c->pitch)),

@@ -199,6 +199,13 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
         goto shader_cleanup;
     }
 
+    sp->uniform_location_g_sampler = glGetUniformLocation(sp->program, "g_sampler");
+    if(sp->uniform_location_g_sampler == -1){
+        LOG_FATAL("Cannot find uniform with name g_sampler. Shader must include uniform with this name");
+        res = SHADER_STATUS_BAD_UNIFORM;
+        goto shader_cleanup;
+    }
+
 
 
     sp->is_initialized = true;

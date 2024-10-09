@@ -1,4 +1,4 @@
-#ifdef WINDOW_GLFW
+
 
 #include "window.h"
 #include "logger.h"
@@ -16,11 +16,6 @@ struct window_impl{
     uint32_t width;
     GLFWwindow* window;
 
-
-    // for sending delta to the camera 
-    bool is_delta_initialized;
-    double last_xpos;
-    double last_ypos;
 };
 
 
@@ -125,7 +120,6 @@ win_init(const char* title, uint32_t height, uint32_t width){
     glfwSetCursorPosCallback(win->window, mouse_callback);  
 
 
-    win->is_delta_initialized = false;
     LOG_INFO("Window initialized");
 
 
@@ -184,4 +178,3 @@ win_get_aspect_ratio(window win){
     return (((float) win->width) / ((float)win->height));
 }
 
-#endif 

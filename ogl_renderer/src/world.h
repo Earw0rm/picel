@@ -6,16 +6,17 @@
 #include "uvn_camera.h"
 #include "shader.h"
 #include "mesh.h"
-
+#include "texture.h"
 
 // this is context manageg. Holding all possible global resources and protect them by mutex
 // TODO impliment concurrent access 
-void world_init();
-void world_destroy();
+void world_init(void);
+void world_destroy(void);
 
-ecs world_get_ecs();
-camera world_get_main_camera();
-shader world_get_basic_shader();
-mesh world_get_basic_mesh();
-window world_get_main_window();
+ecs world_get_ecs(void);
+camera world_get_main_camera(void);
+shader world_get_basic_shader(void);
+mesh world_get_basic_mesh(void);
+window world_get_main_window(void);
+texture world_get_basic_texture(void);
 #endif 

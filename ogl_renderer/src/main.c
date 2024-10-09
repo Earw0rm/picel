@@ -6,12 +6,14 @@
 #include "uvn_camera.h"
 #include "mesh.h"
 #include "render_system.h"
-
+#include "texture.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include "world.h"
-#include <cglm/cglm.h>   /* for inline */
+
+// this 2 include for library testing if we need to compare result against hand made picel_math.h
+// #include <cglm/cglm.h>   /* for inline */
 // #include <cglm/call.h>   /* for library call (this also includes cglm.h) */
 
 static void 
@@ -19,6 +21,8 @@ basic_scene_setup(){
     ecs ecs = world_get_ecs();
     shader basic_shader = world_get_basic_shader();
     mesh basic_cube_mesh = world_get_basic_mesh();
+    texture basic_texture = world_get_basic_texture();
+
 
     ecs_entity cube_entity = ecs_create_entity(ecs);
     component_material* cmat = ecs_get_component(ecs, cube_entity, component_material);
@@ -28,12 +32,11 @@ basic_scene_setup(){
 
     //basic material for our cube
     cmat->shader_program = basic_shader.program;
-    cmat->texture_count  = 0;
-    cmat->textures = nullptr;
+    cmat->texture_obj  = basic_texture.texture_obj;
 
     //starting basic position for our cube. Basicli it is just model matrix
     ctrans->position = v3f(0, 0, -3.0f);
-    ctrans->scale    = v3f(0, 0, 0);
+    ctrans->scale    = v3f(1, 1, 1);
     ctrans->rotation = v3f(0, 0, 0);
 
     // basic mesh component
