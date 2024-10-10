@@ -513,15 +513,14 @@ quaternion_point_rotate(quaternion q, vector3f v){
 static inline matrix4f
 look_at(vector3f world_camera_position, vector3f  world_target, vector3f up){
     matrix4f pos = mat4f_id(1);
-    id.m[12] = -world_camera_position.x;
-    id.m[13] = -world_camera_position.y;
-    id.m[14] = -world_camera_position.z;
+    pos.m[12] = -world_camera_position.x;
+    pos.m[13] = -world_camera_position.y;
+    pos.m[14] = -world_camera_position.z;
 
-    vector3f direction = vec3f_normalize(vec3f_diff(world_camera_position, world_target));
+    vector3f direction = vec3f_normalize(vec3f_diff(world_target, world_camera_position));
     vector3f right = vec3f_normalize(vec3f_cross(up, direction));
-    // new world space up
-    // vector3f nup = vec3f_normalize(vec3f_cross(direction, right));     
-    return mdotm4(mat4f_t_from3fv(right, up, direction), id);
+    vector3f nup = vec3f_normalize(vec3f_cross(direction, right));     
+    return mdotm4(mat4f_t_from3fv(right, nup, direction), id);
 }
 
 #endif 

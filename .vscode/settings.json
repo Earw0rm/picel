@@ -56,7 +56,9 @@
         "world.h": "c",
         "picel_math.h": "c",
         "texture.h": "c",
-        "nuklear_glfw_gl3.h": "c"
+        "nuklear_glfw_gl3.h": "c",
+        "__locale": "c",
+        "locale": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
