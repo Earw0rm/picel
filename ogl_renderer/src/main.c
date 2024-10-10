@@ -35,7 +35,7 @@ basic_scene_setup(){
     cmat->texture_obj  = basic_texture.texture_obj;
 
     //starting basic position for our cube. Basicli it is just model matrix
-    ctrans->position = v3f(0, 0, -3.0f);
+    ctrans->position = v3f(0, 0, 0);
     ctrans->scale    = v3f(1, 1, 1);
     ctrans->rotation = v3f(0, 0, 0);
 

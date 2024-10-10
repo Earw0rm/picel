@@ -43,6 +43,8 @@ uint8_t mesh_init(const char* filepath, mesh* m){
     glGenVertexArrays(1, &m->vao);
     glBindVertexArray(m->vao);
 
+
+    
     glGenBuffers(1, &m->ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ebo);    
     // load data from memory to GPU
@@ -67,13 +69,13 @@ uint8_t mesh_init(const char* filepath, mesh* m){
     // texture vertex attribute pointer
     glVertexAttribPointer( 
             /*layout (location = 0)*/ 1,
-            /*how many data for textures*/2,
+            /*how many data for textures*/2, 
             GL_FLOAT,
             GL_FALSE,
             5 * sizeof(float),
             /*offset inside VBO*/(void*)((3 * sizeof(float)))
     );
-    
+
     m->vertices_num = CUBE_VERTICES_NUM ;
     m->vertices = cube_vertices;
     m->indexes_num = CUBE_INDICES_NUM;

@@ -42,8 +42,8 @@ void world_init(void){
 
         
     store.main_camera = camera_init(
+        v3f(0, 0, 5),
         v3f(0, 0, 0),
-        v3f(0, 0, -3.0f),
         v3f(0, 1.0, 0)
     );
 

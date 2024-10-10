@@ -24,4 +24,9 @@ typedef struct vector4f{
 typedef struct matrix4f { float m[16]; } matrix4f;
 typedef struct matrix3f { float m[12]; } matrix3f;
 
+typedef struct quaternion{
+    float w; // scalar
+    float x, y, z;
+}quaternion;
+
 #endif 

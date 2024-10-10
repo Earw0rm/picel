@@ -426,4 +426,65 @@ mat4f_from_cglm(mat4 m){
     return res;
 }
 
+static inline quaternion
+quaternion_from_axis_angle(float angle, float ux, float uy, float uz){
+    float cos_half_angle = cosf(angle / 2);
+    float sin_half_angle = sinf(angle / 2);
+    quaternion res = {
+        .w = cos_half_angle,
+        .x = ux * sin_half_angle, 
+        .y = uy * sin_half_angle, 
+        .z = uz * sin_half_angle
+    };
+    return res;
+}
+
+
+static inline quaternion
+quaternion_conjugate(quaternion q){
+    quaternion res = {
+        .w = q.w,
+        .x = -q.x,
+        .y = -q.y,
+        .z = -q.z
+    };
+    return res;
+}
+
+static inline quaternion
+quaternion_from_vec3f(vector3f v){
+    quaternion res = {
+        .w = 0,
+        .x = v.x,
+        .y = v.y,
+        .z = v.z
+    };
+    return res;
+}
+
+static inline quaternion
+quaternion_mul(quaternion q1, quaternion q2){
+    quaternion res = {
+        .w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z,
+        .x = q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
+        .y = q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z,
+        .z = q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x
+    };
+    return res;
+}
+
+static inline vector3f
+quaternion_point_rotate(quaternion q, vector3f v){
+    quaternion q_conj = quaternion_conjugate(q);
+    quaternion q_res = quaternion_mul(
+        quaternion_mul(q, quaternion_from_vec3f(v)), q_conj
+    );
+    vector3f v_res = {
+        .x = q_res.x,
+        .y = q_res.y,
+        .z = q_res.z
+    };
+    return res;
+}
+
 #endif 

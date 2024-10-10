@@ -24,6 +24,7 @@ static struct state{
     struct nk_colorf bg;
     uint32_t max_vertex_buffer;
     uint32_t max_element_buffer;
+    bool hidden;
 }state;
 
 
@@ -48,9 +49,12 @@ void gui_system_init(window win, uint32_t max_vertex_buffer, uint32_t max_elemen
     nk_glfw3_font_stash_end(&state.glfw);
     /*nk_style_load_all_cursors(ctx, atlas->cursors);*/
     /*nk_style_set_font(ctx, &droid->handle);*/}
+    state.hidden = true;
 }
 
 void gui_system_render(window win){
+    if(state.hidden) return;
+    
     nk_glfw3_new_frame(&state.glfw);
     if(nk_begin(state.ctx, "demo title", nk_rect(50, 50, 512, 512), 
     NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|

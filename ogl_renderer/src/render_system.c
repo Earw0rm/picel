@@ -20,14 +20,16 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         
         glUseProgram(cmat->shader_program);
         glBindVertexArray(cmesh->vao);        
-        glBindBuffer(GL_ARRAY_BUFFER, cmesh->vbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cmesh->ebo);
-        // TODO crunch 
+
+
+        // sinse we using vao we dont need to activate this
+        // glBindBuffer(GL_ARRAY_BUFFER, cmesh->vbo);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cmesh->ebo);
+
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
         glActiveTexture(GL_TEXTURE0); // Specifies which texture unit to make active.
-
         glBindTexture(GL_TEXTURE_2D, cmat->texture_obj); // today support only one texture
 
 
@@ -48,7 +50,11 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         glUniform1i(g_sampler_loc, 0); // 0 index of texture unit, mean that we say that this samples uses GL_TEXTURE0
         
         glDrawElements(GL_TRIANGLES, cmesh->vectex_count, GL_UNSIGNED_INT, 0 /*last parameter deprecated*/);
+
         glBindVertexArray(0);
         glUseProgram(0);
+
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
     } 
 }
