@@ -389,6 +389,23 @@ mat4f_from3fv(vector3f a, vector3f b, vector3f c){
     return res;
 }
 
+static inline matrix4f
+mat4f_t_from3fv(vector3f a, vector3f b, vector3f c){
+    matrix4f res = mat4f_id(1);
+    res.m[0] = a.x;
+    res.m[4] = a.y;
+    res.m[8] = a.z;
+
+    res.m[1] = b.x;
+    res.m[5] = b.y;
+    res.m[9] = b.z;
+
+    res.m[2] = b.x;
+    res.m[6] = b.y;
+    res.m[10]= b.z;
+    return res;
+}
+
 
 static inline matrix4f
 mat4f_projection(float hfov, float ar, float nearz, float farz) {
@@ -485,6 +502,25 @@ quaternion_point_rotate(quaternion q, vector3f v){
         .z = q_res.z
     };
     return res;
+}
+
+
+/**
+ * @param world_camera_position position of the camera in the world coordinates
+ * @param world_target target/position the camera should look at
+ * @param up vector pointing to the positive y direction, used to create right direction vector
+ */
+static inline matrix4f
+look_at(vector3f world_camera_position, vector3f  world_target, vector3f up){
+    matrix4f pos = mat4f_id(1);
+    id.m[12] = -world_camera_position.x;
+    id.m[13] = -world_camera_position.y;
+    id.m[14] = -world_camera_position.z;
+
+    vector3f direction = vec3f_normalize(vec3f_diff(world_camera_position, world_target));
+    vector3f right = vec3f_normalize(vec3f_cross(up, direction));
+    vector3f nup = vec3f_normalize(vec3f_cross(direction, right));    
+    return mdotm4(mat4f_t_from3fv(right, nup, direction), id);
 }
 
 #endif 
