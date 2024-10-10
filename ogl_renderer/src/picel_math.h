@@ -519,8 +519,9 @@ look_at(vector3f world_camera_position, vector3f  world_target, vector3f up){
 
     vector3f direction = vec3f_normalize(vec3f_diff(world_camera_position, world_target));
     vector3f right = vec3f_normalize(vec3f_cross(up, direction));
-    vector3f nup = vec3f_normalize(vec3f_cross(direction, right));    
-    return mdotm4(mat4f_t_from3fv(right, nup, direction), id);
+    // new world space up
+    // vector3f nup = vec3f_normalize(vec3f_cross(direction, right));     
+    return mdotm4(mat4f_t_from3fv(right, up, direction), id);
 }
 
 #endif 
