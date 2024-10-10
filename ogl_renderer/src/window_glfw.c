@@ -7,8 +7,6 @@
 #include "event_system.h"
 #include <stdlib.h>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 struct window_impl{
     const char* title;
@@ -178,3 +176,7 @@ win_get_aspect_ratio(window win){
     return (((float) win->width) / ((float)win->height));
 }
 
+GLFWwindow*
+win_get_glfw_ctx(window p){
+    return p->window;
+}

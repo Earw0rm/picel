@@ -61,6 +61,7 @@ on_mouse_pos_changed(event_code code,
     double delta_y = (c->last_ypos - data.data.d64[1]);
 
 
+
     c->last_xpos = data.data.d64[0];
     c->last_ypos = data.data.d64[1];
 

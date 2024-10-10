@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include "math_struct.h"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 typedef struct window_impl* window;
 
 
@@ -18,5 +20,7 @@ void win_swap_buffers(window pwindow);
 bool win_should_close(window pwindow);
 float win_get_aspect_ratio(window pwindow);
 
+
+GLFWwindow* win_get_glfw_ctx(window p);
 
 #endif 
