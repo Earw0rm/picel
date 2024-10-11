@@ -3,7 +3,7 @@
 
 #include "ecs.h"
 #include "window.h"
-#include "uvn_camera.h"
+#include "camera.h"
 #include "shader.h"
 #include "mesh.h"
 #include "texture.h"

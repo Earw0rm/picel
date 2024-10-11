@@ -30,6 +30,7 @@ static struct state{
 
 
 void gui_system_init(window win, uint32_t max_vertex_buffer, uint32_t max_element_buffer){
+
     GLFWwindow* glfw_ctx = win_get_glfw_ctx(win);
     state.ctx = nk_glfw3_init(&state.glfw, glfw_ctx, NK_GLFW3_INSTALL_CALLBACKS);
     state.bg.r = 0.10f, state.bg.g = 0.18f, state.bg.b = 0.24f, state.bg.a = 1.0f;
@@ -54,7 +55,7 @@ void gui_system_init(window win, uint32_t max_vertex_buffer, uint32_t max_elemen
 
 void gui_system_render(window win){
     if(state.hidden) return;
-    
+
     nk_glfw3_new_frame(&state.glfw);
     if(nk_begin(state.ctx, "demo title", nk_rect(50, 50, 512, 512), 
     NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|

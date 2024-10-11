@@ -20,6 +20,10 @@ test:
 	make -C ./yasyc build
 	make -C ./yasyc test
 	make -C ./ogl_renderer test
+	
+valgrind:
+	make -C ./yasyc build
+	make -C ./ogl_renderer valgrind
 
 run: 
 	make -C ./ogl_renderer run 

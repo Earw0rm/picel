@@ -501,11 +501,12 @@ quaternion_point_rotate(quaternion q, vector3f v){
         .y = q_res.y,
         .z = q_res.z
     };
-    return res;
+    return v_res;
 }
 
 
 /**
+ * https://chanhaeng.blogspot.com/2018/09/quaternion-camera-implementation.html
  * @param world_camera_position position of the camera in the world coordinates
  * @param world_target target/position the camera should look at
  * @param up vector pointing to the positive y direction, used to create right direction vector
@@ -520,7 +521,66 @@ look_at(vector3f world_camera_position, vector3f  world_target, vector3f up){
     vector3f direction = vec3f_normalize(vec3f_diff(world_target, world_camera_position));
     vector3f right = vec3f_normalize(vec3f_cross(up, direction));
     vector3f nup = vec3f_normalize(vec3f_cross(direction, right));     
-    return mdotm4(mat4f_t_from3fv(right, nup, direction), id);
+    return mdotm4(mat4f_t_from3fv(right, nup, direction), pos);
+}
+
+static inline quaternion
+quartenion_normalize(quaternion q){
+    float norm = sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+    q.w /= norm;
+    q.x /= norm;
+    q.y /= norm;
+    q.z /= norm;
+    return q;
+}
+
+/**
+ * https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
+ * @param world_camera_position position of the camera in the world coordinates
+ * @param q quartenion that describe rotation
+ */
+static inline matrix4f
+quartenion_look_at(vector3f position, quaternion q){
+    matrix4f pos = mat4f_id(1);
+    matrix4f r = mat4f_id(1);
+
+    pos.m[12] = -position.x;
+    pos.m[13] = -position.y;
+    pos.m[14] = -position.z;
+
+    float xx = q.x * q.x;
+    float yy = q.y * q.y;
+    float zz = q.z * q.z;
+
+    float xy = q.x * q.y;
+    float xz = q.x * q.z;
+    float yz = q.y * q.z;
+
+    float wx = q.w * q.x;
+    float wy = q.w * q.y;
+    float wz = q.w * q.z;
+    
+    // LOG_INFO("yy + zz %f", zz);
+    // LOG_INFO("xx + zz %f", zz);
+
+    r.m[0] = 1.0f - 2.0f * (yy + zz);
+    r.m[1] = 2.0f * (xy + wz);
+    r.m[2] = 2.0f * (xz - wy);  
+
+    r.m[4] = 2.0f * (xy - wz);
+    r.m[5] = 1.0 - 2.0f * (xx + zz);
+    r.m[6] = 2.0f * (yz + wx);
+
+    r.m[8] = 2.0f * (xz + wy);
+    r.m[9] = 2.0f * (yz - wx);
+    r.m[10] = 1.0f - 2.0f * (xx + yy);
+
+    // LOG_INFO("r matrix");
+    // log_matrix4f(r);
+    // LOG_INFO("pos matrix");
+    // log_matrix4f(pos);
+
+    return mdotm4(r, pos);
 }
 
 #endif 

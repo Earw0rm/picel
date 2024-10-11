@@ -3,7 +3,7 @@
 #include "event_system.h"
 #include "ecs.h"
 #include "shader.h"
-#include "uvn_camera.h"
+#include "camera.h"
 #include "mesh.h"
 #include "render_system.h"
 #include "texture.h"
@@ -59,13 +59,13 @@ int main(int argc, char const *argv[]){
         camera main_camera = world_get_main_camera();
         window main_window = world_get_main_window();
 
-        gui_system_init(main_window, 512 * 1024, 128 * 1024);
+        // gui_system_init(main_window, 512 * 1024, 128 * 1024);
 
 
         while(!win_should_close(main_window)){
 
             render_system_render(ecs, main_window, main_camera);
-            gui_system_render(main_window);
+            // gui_system_render(main_window);
 
             win_swap_buffers(main_window);
             win_poll_events(main_window);
@@ -73,7 +73,7 @@ int main(int argc, char const *argv[]){
 
         }
 
-        gui_system_destroy();
+        // gui_system_destroy();
         world_destroy();
         exit(EXIT_SUCCESS);
 }

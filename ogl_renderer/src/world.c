@@ -40,14 +40,7 @@ void world_init(void){
         exit(basic_mesh_init_res);
     }
 
-        
-    store.main_camera = camera_init(
-        v3f(0, 0, 5),
-        v3f(0, 0, 0),
-        v3f(0, 1.0, 0)
-    );
-
-    if(store.main_camera == nullptr){
+    if((store.main_camera = camera_init(v3f(0, 0, 5), v3f(0, 0, -1))) == nullptr){
         exit(-1);
     }
 

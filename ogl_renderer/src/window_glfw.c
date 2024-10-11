@@ -2,7 +2,7 @@
 
 #include "window.h"
 #include "logger.h"
-#include "uvn_camera.h"
+#include "camera.h"
 #include "math.h"
 #include "event_system.h"
 #include <stdlib.h>
@@ -70,13 +70,17 @@ process_camera_move(window win){
     }
 
 }
+static void error_callback(int e, const char *d){
+    LOG_FATAL("GLFW ERROR: %d: %s",  e, d);
+}
 
 
 window
 win_init(const char* title, uint32_t height, uint32_t width){
 
     window win = malloc(sizeof(struct window_impl));;
-    
+    glfwSetErrorCallback(error_callback);
+
     if(!glfwInit()){
         LOG_FATAL("cannot initialize glfw");
         goto ret_error;
@@ -135,8 +139,10 @@ win_destroy(window win){
         LOG_DEBUG("cannot destroy nullptr window");
         return;
     }
+    
     glfwDestroyWindow(win->window);
     glfwTerminate();
+    free(win);
 }
 
 bool

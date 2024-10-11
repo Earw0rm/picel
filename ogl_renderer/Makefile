@@ -44,11 +44,17 @@ debug: ogl_renderer
 test: ogl_renderer_test
 	$(BUILD_DIR)/$(TEST_OUT)
 
+# --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose
+valgrind: ogl_renderer 
+	valgrind   $(BUILD_DIR)/$(OUT)
+
 ogl_renderer: $(OBJ_FILES)
 	$(COMPILER) -o $(BUILD_DIR)/$(OUT) $(OBJ_FILES) $(DEFINES) $(INCLUDE_FLAGS) $(LINKER_FLAGS) $(OPS)
 
 ogl_renderer_test: $(OBJ_FILES_NO_MAIN)
 	$(COMPILER) -o $(BUILD_DIR)/$(TEST_OUT) $(OBJ_FILES_NO_MAIN) $(DEFINES) $(INCLUDE_FLAGS)  $(LINKER_FLAGS) $(OPS)
+
+
 
 
 $(BUILD_DIR)/src/%.o: $(SOURCE_DIR)/%.c
