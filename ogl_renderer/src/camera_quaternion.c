@@ -27,10 +27,10 @@ on_key_press(event_code code,
              event_context data){
     camera c = (camera) listener_inst;
     uint16_t key_code = data.data.ui16[0];
+    
 
-    quaternion q_front = quaternion_mul(c->orientation, quaternion_mul(c->initial_target, quaternion_conjugate(c->orientation)));
-    vector3f front = v3f(q_front.x, q_front.y, q_front.z);
-    vector3f right = vec3f_normalize(vec3f_cross(front, v3f(0, 1, 0)));
+    vector3f front = vec3f_normalize(quaternion_point_rotate(c->orientation, v3f(0, 0, -1)));
+    vector3f right = vec3f_normalize(quaternion_point_rotate(c->orientation, v3f(1, 0, 0)));
 
     if(key_code == GLFW_KEY_W){
         c->position = vec3f_summ(c->position, vec3f_scalar_mul(front, CAMERA_SPEED));

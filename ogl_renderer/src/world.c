@@ -28,7 +28,7 @@ void world_init(void){
     store.ecs = ecs_init();
 
 
-    if((store.main_window = win_init("asd", 1024, 2048)) == nullptr){
+    if((store.main_window = win_init("asd", 2048, 4000)) == nullptr){
         exit(-1);
     }
 
