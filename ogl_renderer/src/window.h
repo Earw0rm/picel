@@ -20,7 +20,7 @@ void win_swap_buffers(window pwindow);
 bool win_should_close(window pwindow);
 float win_get_aspect_ratio(window pwindow);
 
-
+matrix4f win_get_view(window pwindow);
 GLFWwindow* win_get_glfw_ctx(window p);
 
 #endif 

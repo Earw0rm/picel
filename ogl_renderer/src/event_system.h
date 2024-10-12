@@ -38,8 +38,9 @@ typedef enum event_code{
     EVENT_CODE_KEY_RELEASED = 0x03,
 
     /**
-     * Context usage:
-     * u16 button = data.u16[0]
+    * ctx.data.ui16[0] = button;
+    * ctx.data.ui16[1] = action;
+    * ctx.data.ui16[2] = mods;
      */
     EVENT_CODE_BUTTON_PRESSED = 0x04,
 
@@ -53,6 +54,8 @@ typedef enum event_code{
      * Context usage:
      * double_t xpos = d64[0];
      * double_t ypos = d64[1];
+     * 
+     * 
      */
     EVENT_CODE_MOUSE_MOVED = 0x06,    
 
@@ -60,6 +63,7 @@ typedef enum event_code{
      * Context usage: ?? 
      */
     EVENT_CODE_MOUSE_WHEEL = 0x07,
+
 
     /**
      * Context usage: wtf

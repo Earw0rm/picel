@@ -1,3 +1,5 @@
+#ifdef QUAT_CAMERA
+
 #include "camera.h"
 #include "event_system.h"
 #include <glad/glad.h>
@@ -140,3 +142,5 @@ matrix4f camera_get_view(camera camera){
 
     return res;
 }
+
+#endif 

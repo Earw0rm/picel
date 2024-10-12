@@ -4,7 +4,8 @@
 
 
 void render_system_render(ecs ecs, window w, camera main_camera){
-    matrix4f view = camera_get_view(main_camera);
+    // matrix4f view = camera_get_view(main_camera);
+    matrix4f view = win_get_view(w);
     float aspect_ratio = win_get_aspect_ratio(w);
     matrix4f projection = mat4f_projection(20.0f, aspect_ratio, 1, 100);
 

@@ -180,6 +180,11 @@ vec3f_cross(vector3f a, vector3f b) {
     return res;
 }
 
+static inline float
+vec3f_dot(vector3f a, vector3f b) {
+    return (a.x * b.x + a.y * b.y + a.z * b.z);
+}
+
 static inline vector4f 
 vec4f_from3f(vector3f v){
     vector4f res = {
@@ -455,7 +460,16 @@ quaternion_from_axis_angle(float angle, float ux, float uy, float uz){
     };
     return res;
 }
-
+static inline quaternion
+quaternion_id(void){
+    quaternion res = {
+        .w = 1,
+        .x = 0,
+        .y = 0,
+        .z = 0
+    };
+    return res;
+}
 
 static inline quaternion
 quaternion_conjugate(quaternion q){
@@ -540,7 +554,7 @@ quartenion_normalize(quaternion q){
  * @param q quartenion that describe rotation
  */
 static inline matrix4f
-quartenion_look_at(vector3f position, quaternion q){
+quaternion_look_at(vector3f position, quaternion q){
     matrix4f pos = mat4f_id(1);
     matrix4f r = mat4f_id(1);
 
