@@ -33,6 +33,13 @@ log_matrix3f(matrix3f m){
     LOG_INFO("===================================================");
 }
 
+static inline void 
+log_vector3f(vector3f v){
+
+    LOG_INFO("| %f %f %f|", v.x, v.y, v.z);
+
+}
+
 static inline matrix4f 
 mat4f_id(const float f){
     matrix4f ret = { f, 0, 0, 0,
@@ -387,9 +394,9 @@ mat4f_from3fv(vector3f a, vector3f b, vector3f c){
     res.m[5] = b.y;
     res.m[6] = b.z;
 
-    res.m[8] = b.x;
-    res.m[9] = b.y;
-    res.m[10]= b.z;
+    res.m[8] = c.x;
+    res.m[9] = c.y;
+    res.m[10]= c.z;
 
     return res;
 }
@@ -405,9 +412,9 @@ mat4f_t_from3fv(vector3f a, vector3f b, vector3f c){
     res.m[5] = b.y;
     res.m[9] = b.z;
 
-    res.m[2] = b.x;
-    res.m[6] = b.y;
-    res.m[10]= b.z;
+    res.m[2] = c.x;
+    res.m[6] = c.y;
+    res.m[10]= c.z;
     return res;
 }
 
@@ -450,8 +457,14 @@ mat4f_from_cglm(mat4 m){
 
 static inline quaternion
 quaternion_from_axis_angle(float angle, float ux, float uy, float uz){
-    float cos_half_angle = cosf(angle / 2);
-    float sin_half_angle = sinf(angle / 2);
+    
+    float magnitude = sqrtf(ux*ux + uy*uy + uz*uz);
+    ux = ux / magnitude;
+    uy = uy / magnitude;
+    uz = uz / magnitude;
+
+    float cos_half_angle = cosf(angle / 2.0f);
+    float sin_half_angle = sinf(angle / 2.0f);
     quaternion res = {
         .w = cos_half_angle,
         .x = ux * sin_half_angle, 
@@ -494,12 +507,12 @@ quaternion_from_vec3f(vector3f v){
 }
 
 static inline quaternion
-quaternion_mul(quaternion q1, quaternion q2){
+quaternion_mul(quaternion left, quaternion right){
     quaternion res = {
-        .w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z,
-        .x = q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
-        .y = q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z,
-        .z = q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x
+        .w = left.w * right.w - left.x * right.x - left.y * right.y - left.z * right.z,
+        .x = left.w * right.x + left.x * right.w + left.y * right.z - left.z * right.y,
+        .y = left.w * right.y + left.y * right.w + left.z * right.x - left.x * right.z,
+        .z = left.w * right.z + left.z * right.w + left.x * right.y - left.y * right.x
     };
     return res;
 }
@@ -532,14 +545,33 @@ look_at(vector3f world_camera_position, vector3f  world_target, vector3f up){
     pos.m[13] = -world_camera_position.y;
     pos.m[14] = -world_camera_position.z;
 
-    vector3f direction = vec3f_normalize(vec3f_diff(world_target, world_camera_position));
-    vector3f right = vec3f_normalize(vec3f_cross(up, direction));
-    vector3f nup = vec3f_normalize(vec3f_cross(direction, right));     
+    LOG_INFO("world_camera_position");
+    log_vector3f(world_camera_position);
+    LOG_INFO("world_target");
+    log_vector3f(world_target);
+    LOG_INFO("up");
+    log_vector3f(up);
+
+
+
+    vector3f direction = vec3f_normalize(vec3f_diff(world_camera_position, world_target));
+    vector3f right = vec3f_normalize(vec3f_cross(direction, up));
+    vector3f nup = vec3f_normalize(vec3f_cross(right, direction));     
+
+
+
+    /**
+     * | R R R |
+     * | U U U |
+     * | D D D |
+     */
+
+
     return mdotm4(mat4f_t_from3fv(right, nup, direction), pos);
 }
 
 static inline quaternion
-quartenion_normalize(quaternion q){
+quaternion_normalize(quaternion q){
     float norm = sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
     q.w /= norm;
     q.x /= norm;
@@ -548,20 +580,41 @@ quartenion_normalize(quaternion q){
     return q;
 }
 
+
+static inline matrix4f
+mat4_transpose_3x3_inside(matrix4f m){
+    matrix4f res;
+
+    res.m[0] = m.m[0];
+    res.m[4] = m.m[1];
+    res.m[8] = m.m[2];
+    res.m[3] = m.m[3];
+  
+    res.m[1] = m.m[4];
+    res.m[5] = m.m[5];
+    res.m[9] = m.m[6];
+    res.m[7] = m.m[7];                        
+  
+    res.m[2]  = m.m[8];
+    res.m[6]  = m.m[9];
+    res.m[10] = m.m[10];
+    res.m[11] = m.m[11];
+
+    res.m[12] = m.m[12];
+    res.m[13] = m.m[13];
+    res.m[14] = m.m[14];
+    res.m[15] = m.m[15];        
+    return res;
+}
+
 /**
  * https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
- * @param world_camera_position position of the camera in the world coordinates
  * @param q quartenion that describe rotation
+ * @return matrix that represent a quartenion rotation
  */
-static inline matrix4f
-quaternion_look_at(vector3f position, quaternion q){
-    matrix4f pos = mat4f_id(1);
-    matrix4f r = mat4f_id(1);
-
-    pos.m[12] = -position.x;
-    pos.m[13] = -position.y;
-    pos.m[14] = -position.z;
-
+static inline matrix3f
+quaternion_to_matrix(quaternion q){
+    matrix3f res = mat3f_id(1);
     float xx = q.x * q.x;
     float yy = q.y * q.y;
     float zz = q.z * q.z;
@@ -573,28 +626,49 @@ quaternion_look_at(vector3f position, quaternion q){
     float wx = q.w * q.x;
     float wy = q.w * q.y;
     float wz = q.w * q.z;
+
+    res.m[0] = 1.0f - 2.0f * (yy + zz);
+    res.m[1] = 2.0f * (xy + wz);
+    res.m[2] = 2.0f * (xz - wy);  
     
-    // LOG_INFO("yy + zz %f", zz);
-    // LOG_INFO("xx + zz %f", zz);
+    res.m[3] = 2.0f * (xy - wz);
+    res.m[4] = 1.0 - 2.0f * (xx + zz);
+    res.m[5] = 2.0f * (yz + wx);
+    
+    res.m[6] = 2.0f * (xz + wy);
+    res.m[7] = 2.0f * (yz - wx);
+    res.m[8] = 1.0f - 2.0f * (xx + yy);
 
-    r.m[0] = 1.0f - 2.0f * (yy + zz);
-    r.m[1] = 2.0f * (xy + wz);
-    r.m[2] = 2.0f * (xz - wy);  
-
-    r.m[4] = 2.0f * (xy - wz);
-    r.m[5] = 1.0 - 2.0f * (xx + zz);
-    r.m[6] = 2.0f * (yz + wx);
-
-    r.m[8] = 2.0f * (xz + wy);
-    r.m[9] = 2.0f * (yz - wx);
-    r.m[10] = 1.0f - 2.0f * (xx + yy);
-
-    // LOG_INFO("r matrix");
-    // log_matrix4f(r);
-    // LOG_INFO("pos matrix");
-    // log_matrix4f(pos);
-
-    return mdotm4(r, pos);
+    return res;
 }
+
+// http://courses.cms.caltech.edu/cs171/assignments/hw3/hw3-notes/notes-hw3.html
+static inline matrix4f
+mat4v_axis_angle_rotation(float angle, vector3f axis){
+    matrix4f res = mat4f_id(1);
+    float cos_angle = cosf(angle);
+    float sin_angle = sinf(angle);
+    float xx = axis.x * axis.x;
+    float yy = axis.y * axis.y;
+    float zz = axis.z * axis.z;
+    float xy = axis.x * axis.y;
+    float zx = axis.z * axis.x;
+    float zy = axis.z * axis.y;
+
+
+    res.m[0] = xx + (1 - xx) * cos_angle;
+    res.m[1] = xy * (1 - cos_angle) + axis.z * sin_angle;
+    res.m[2] = zx * (1 - cos_angle) - axis.y * sin_angle;
+
+    res.m[4] = xy * (1 - cos_angle) - axis.z * sin_angle;
+    res.m[5] = yy + (1 - yy) * cos_angle;
+    res.m[6] = zy * (1 - cos_angle) + axis.x * sin_angle;
+
+    res.m[8] = xy * (1 - cos_angle) + axis.y * sin_angle;
+    res.m[9] = zy * (1 - cos_angle) - axis.x * sin_angle;
+    res.m[10] = zz + (1 - zz) * cos_angle;        
+    return res;
+}
+
 
 #endif 

@@ -31,17 +31,20 @@
  */
 //singleton window camera. Boolsheet and crunch
 static struct arcball_camera{
+    vector3f camera_direction;
+    vector3f camera_up;
     vector3f camera_position;
+
     vector3f rotation_start_position;
     bool is_rotating_now;
-
-
     quaternion last_rotation;
+
     uint32_t global_width;
     uint32_t global_height;
-
     float radius;
+
 } arcball_camera;
+
 
 
 struct window_impl{
@@ -55,13 +58,11 @@ struct window_impl{
 
 inline static float 
 x_to_ndc(uint32_t global_width, double x, float radius){
-    LOG_INFO("x_to_ndc %i %f %f", global_width, x, radius);
     return ((2 * x / global_width) - 1) * radius;
 } 
 
 inline static float
 y_to_ndc(uint32_t global_height, double y, float radius){
-    LOG_INFO("y_to_ndc %i %f %f", global_height,y, radius);
     return (1 - 2 * ( y / global_height)) * radius;
 } 
 
@@ -78,6 +79,8 @@ key_input_callback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t ac
     if(key == GLFW_KEY_ESCAPE){
         glfwSetWindowShouldClose(window, true);
     }
+
+
 }
 
 static void
@@ -88,11 +91,15 @@ mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
             vector3f start_position;
             start_position.x = x_to_ndc(arcball_camera.global_width, xpos, arcball_camera.radius);
             start_position.y = y_to_ndc(arcball_camera.global_height, ypos, arcball_camera.radius);
-            start_position.z = sqrtf(
-                arcball_camera.radius * arcball_camera.radius -
-                start_position.x * start_position.x -
-                start_position.y * start_position.y                                
-            );
+            float start_pos_x_sq = start_position.x * start_position.x;
+            float start_pos_y_sq = start_position.y * start_position.y;
+            float radius_sq = arcball_camera.radius * arcball_camera.radius;
+            if(start_pos_x_sq + start_pos_y_sq <= radius_sq){
+                start_position.z = sqrtf(radius_sq - start_pos_x_sq - start_pos_y_sq);
+            }else{
+                start_position.z = 0;
+            }
+
             arcball_camera.rotation_start_position = vec3f_normalize(start_position);
             arcball_camera.is_rotating_now = true;
             return;
@@ -102,70 +109,45 @@ mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
         immidiate_position.x = x_to_ndc(arcball_camera.global_width, xpos, arcball_camera.radius);
         immidiate_position.y = y_to_ndc(arcball_camera.global_height, ypos, arcball_camera.radius);
 
-        immidiate_position.z = sqrtf(
-                arcball_camera.radius * arcball_camera.radius -
-                immidiate_position.x * immidiate_position.x -
-                immidiate_position.x * immidiate_position.y                                
-        );
-        immidiate_position = vec3f_normalize(immidiate_position);
-        
+        float im_pos_x_sq = immidiate_position.x * immidiate_position.x;
+        float im_pos_y_sq = immidiate_position.y * immidiate_position.y;
+        float radius_sq = arcball_camera.radius * arcball_camera.radius;
 
-        vector3f rotation_axis = vec3f_cross(arcball_camera.rotation_start_position, immidiate_position);
+        if(im_pos_x_sq + im_pos_y_sq <= radius_sq){
+            immidiate_position.z = sqrtf(radius_sq - im_pos_x_sq - im_pos_y_sq);
+        }else{
+            immidiate_position.z = 0;
+        }
+        immidiate_position = vec3f_normalize(immidiate_position);   
+        vector3f rotation_axis = vec3f_normalize(vec3f_cross(arcball_camera.rotation_start_position, immidiate_position));
         float cos_angle = vec3f_dot(immidiate_position, arcball_camera.rotation_start_position);
+
+        if(cos_angle > 1){
+            cos_angle = 1;
+        }else if(cos_angle < -1){
+            cos_angle = -1;
+        }
         float angle = acosf(cos_angle);
-
         quaternion quat = quaternion_from_axis_angle(angle, rotation_axis.x, rotation_axis.y, rotation_axis.z);
-   
+        arcball_camera.last_rotation = quaternion_normalize(quaternion_mul(quat, arcball_camera.last_rotation));
 
-        
-
-        arcball_camera.last_rotation = quaternion_mul(quat, arcball_camera.last_rotation);
+        LOG_INFO("quat [%f %f %f %f]", quat.w, quat.x, quat.y, quat.z);
+        LOG_INFO("last rotation [%f %f %f %f]", arcball_camera.last_rotation.w, arcball_camera.last_rotation.x, arcball_camera.last_rotation.y, arcball_camera.last_rotation.z);
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE){
         if(arcball_camera.is_rotating_now){
             arcball_camera.is_rotating_now = false;
         }
-        //replace 
+
     }
 }
 
 
 
-// static void 
-// process_camera_move(window win){
-//     uint32_t key_w = glfwGetKey(win->window, GLFW_KEY_W);
-//     uint32_t key_s = glfwGetKey(win->window, GLFW_KEY_S);
-//     uint32_t key_a = glfwGetKey(win->window, GLFW_KEY_A);
-//     uint32_t key_d = glfwGetKey(win->window, GLFW_KEY_D);
-
-//     if(key_w == GLFW_PRESS){
-//         event_context ctx;
-//         ctx.data.ui16[0] = GLFW_KEY_W; 
-//         event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-//     }
-//     if(key_s == GLFW_PRESS){
-//         event_context ctx;
-//         ctx.data.ui16[0] = GLFW_KEY_S; 
-//         event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-//     }
-//     if(key_a == GLFW_PRESS){
-//         event_context ctx;
-//         ctx.data.ui16[0] = GLFW_KEY_A; 
-//         event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-//     }
-//     if(key_d == GLFW_PRESS){
-//         event_context ctx;
-//         ctx.data.ui16[0] = GLFW_KEY_D; 
-//         event_system_fire(EVENT_CODE_KEY_PRESSED, nullptr, ctx);
-//     }
-
-// }
 static void error_callback(int e, const char *d){
     LOG_FATAL("GLFW ERROR: %d: %s",  e, d);
 }
-
-
 
 
 window
@@ -205,8 +187,14 @@ win_init(const char* title, uint32_t height, uint32_t width){
     arcball_camera.global_height = height;
     arcball_camera.global_width  = width;
 
-    arcball_camera.camera_position = v3f(0, 0, 3);
+
+    arcball_camera.camera_position = v3f(0, 0, 40);
+    // we look at 0
+    arcball_camera.camera_direction = vec3f_diff(v3f(0, 0, 0), arcball_camera.camera_position);
+    arcball_camera.camera_up = v3f(0, 1, 0);
+
     arcball_camera.last_rotation = quaternion_id();
+
 
     glfwSetFramebufferSizeCallback(win->window, resize_callback);
     glfwSetKeyCallback(win->window, key_input_callback);
@@ -294,6 +282,16 @@ win_get_glfw_ctx(window p){
 
 matrix4f 
 win_get_view(window pwindow){
-    matrix4f res = quaternion_look_at(arcball_camera.camera_position, arcball_camera.last_rotation);
+    matrix3f rotation = quaternion_to_matrix(arcball_camera.last_rotation);
+    arcball_camera.camera_direction = mdotv3(rotation, arcball_camera.camera_direction);
+    arcball_camera.camera_up = mdotv3(rotation, arcball_camera.camera_up);
+    arcball_camera.camera_position = mdotv3(rotation, arcball_camera.camera_position);
+
+
+    matrix4f res = look_at(arcball_camera.camera_position,
+                           vec3f_summ(arcball_camera.camera_direction, arcball_camera.camera_position),
+                           arcball_camera.camera_up);
+    LOG_INFO("VIEW");
+    log_matrix4f(res);
     return res;
 }

@@ -5,7 +5,7 @@
 
 void render_system_render(ecs ecs, window w, camera main_camera){
     // matrix4f view = camera_get_view(main_camera);
-    matrix4f view = win_get_view(w);
+
     float aspect_ratio = win_get_aspect_ratio(w);
     matrix4f projection = mat4f_projection(20.0f, aspect_ratio, 1, 100);
 
@@ -39,11 +39,15 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         GLint projection_loc = glGetUniformLocation(cmat->shader_program, "projection");    
         GLint g_sampler_loc  = glGetUniformLocation(cmat->shader_program, "g_sampler");
     
-
+        matrix4f view = win_get_view(w);
         matrix4f model = mat4f_id(1);
         model = mat4f_scale(model, ctrans->scale.x, ctrans->scale.y, ctrans->scale.z);
         model = mat4f_rotate(model, ctrans->rotation.x, ctrans->rotation.y, ctrans->rotation.z);
         model = mat4f_translate(model, ctrans->position.x, ctrans->position.y, ctrans->position.z);      
+
+
+
+
 
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, view.m);        
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, projection.m);
