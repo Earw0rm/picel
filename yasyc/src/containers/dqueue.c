@@ -4,9 +4,6 @@
 #include "logger.h"
 
 
-
-
-
 typedef struct dqueue_header{
     uint64_t capacity;
     uint64_t lenght; 

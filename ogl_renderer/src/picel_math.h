@@ -545,28 +545,15 @@ look_at(vector3f world_camera_position, vector3f  world_target, vector3f up){
     pos.m[13] = -world_camera_position.y;
     pos.m[14] = -world_camera_position.z;
 
-    LOG_INFO("world_camera_position");
-    log_vector3f(world_camera_position);
-    LOG_INFO("world_target");
-    log_vector3f(world_target);
-    LOG_INFO("up");
-    log_vector3f(up);
-
-
-
     vector3f direction = vec3f_normalize(vec3f_diff(world_camera_position, world_target));
     vector3f right = vec3f_normalize(vec3f_cross(direction, up));
     vector3f nup = vec3f_normalize(vec3f_cross(right, direction));     
-
-
 
     /**
      * | R R R |
      * | U U U |
      * | D D D |
      */
-
-
     return mdotm4(mat4f_t_from3fv(right, nup, direction), pos);
 }
 
