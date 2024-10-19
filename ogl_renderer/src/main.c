@@ -47,6 +47,37 @@ basic_scene_setup(){
 
 
     ecs_add_components(ecs, cube_entity, component_material, component_transform, component_mesh, component_renderable);
+
+
+    //second object (light source)
+    basic_shader = world_get_basic_shader();
+    basic_cube_mesh = world_get_basic_mesh();
+    basic_texture = world_get_basic_texture();
+
+
+    ecs_entity light_cube_entity = ecs_create_entity(ecs);
+    cmat = ecs_get_component(ecs, light_cube_entity, component_material);
+    ctrans = ecs_get_component(ecs, light_cube_entity, component_transform);
+    cmesh = ecs_get_component(ecs, light_cube_entity, component_mesh);
+
+
+    //basic material for our cube
+    cmat->shader_program = basic_shader.program;
+    cmat->texture_obj  = 0;
+
+    //starting basic position for our cube. Basicli it is just model matrix
+    ctrans->position = v3f(-2, 2, -5);
+    ctrans->scale    = v3f(1, 1, 1);
+    ctrans->rotation = v3f(0, 0, 0);
+
+    // basic mesh component
+    cmesh->ebo = basic_cube_mesh.ebo;
+    cmesh->vbo = basic_cube_mesh.vbo;
+    cmesh->vao = basic_cube_mesh.vao;
+    cmesh->vectex_count = basic_cube_mesh.vertices_num; // vertex_count?
+
+    ecs_add_components(ecs, light_cube_entity, component_material, component_transform, component_mesh, component_renderable);
+
 }
 
 int main(int argc, char const *argv[]){

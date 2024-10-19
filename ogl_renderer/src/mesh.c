@@ -7,7 +7,7 @@
 #define CUBE_INDICES_NUM  (12 * 3)
 static float cube_vertices[CUBE_VERTICES_NUM] = {
                             /*texture coordinates*/
-    0.5f,  0.5f,  0.5f,        0.0f, 0.0f, 
+    0.5f,  0.5f,  0.5f,        0.0f, 0.0f,
    -0.5f,  0.5f, -0.5f,        0.0f, 1.0f, 
    -0.5f,  0.5f,  0.5f,        1.0f, 0.0f, 
     0.5f, -0.5f, -0.5f,        1.0f, 1.0f, 
@@ -68,13 +68,16 @@ uint8_t mesh_init(const char* filepath, mesh* m){
 
     // texture vertex attribute pointer
     glVertexAttribPointer( 
-            /*layout (location = 0)*/ 1,
+            /*layout (location = 1)*/ 1,
             /*how many data for textures*/2, 
             GL_FLOAT,
             GL_FALSE,
             5 * sizeof(float),
             /*offset inside VBO*/(void*)((3 * sizeof(float)))
     );
+
+    //default white color
+    glVertexAttrib4f(2, 1.0, 1.0, 1.0, 1.0);
 
     m->vertices_num = CUBE_VERTICES_NUM ;
     m->vertices = cube_vertices;

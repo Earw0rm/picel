@@ -142,7 +142,6 @@ mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
         float angle = acosf(cos_angle) * ROTATION_SENSETIVE;
         quaternion quat = quaternion_from_axis_angle(angle, rotation_axis.x, -rotation_axis.y, rotation_axis.z);
         
-
         // arcball_camera.last_rotation = quaternion_normalize(quaternion_mul(quat, arcball_camera.last_rotation));
         arcball_camera.last_rotation = quaternion_normalize(quaternion_mul(quat, arcball_camera.prev_rotation));
     }
@@ -160,7 +159,8 @@ mouse_callback(GLFWwindow* window, double_t xpos, double_t ypos){
 
 
 
-static void error_callback(int e, const char *d){
+static void 
+error_callback(int e, const char *d){
     LOG_FATAL("GLFW ERROR: %d: %s",  e, d);
 }
 
@@ -229,8 +229,6 @@ win_init(const char* title, uint32_t height, uint32_t width){
     // glfwSetWindowFocusCallback(win->window, window_focus_callback);
 
     glfwSetCursorPosCallback(win->window, mouse_callback);  
-
-
     LOG_INFO("Window initialized");
 
     return win;
