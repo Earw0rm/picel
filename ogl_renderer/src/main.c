@@ -33,6 +33,12 @@ basic_scene_setup(){
     //basic material for our cube
     cmat->shader_program = basic_shader.program;
     cmat->texture_obj  = basic_texture.texture_obj;
+    
+    // basic cube materials
+    cmat->ambient = v3f_id(1);
+    cmat->diffuse = v3f_id(1);
+    cmat->specular = v3f_id(1);  
+    cmat->shininnes = 32;
 
     //starting basic position for our cube. Basicli it is just model matrix
     ctrans->position = v3f(0, 0, 0);
@@ -65,7 +71,13 @@ basic_scene_setup(){
     cmat->shader_program = basic_shader.program;
     cmat->texture_obj  = 0;
 
-    //starting basic position for our cube. Basicli it is just model matrix
+    cmat->ambient = v3f_id(1);
+    cmat->diffuse = v3f_id(1);
+    cmat->specular = v3f_id(1);  
+    cmat->shininnes = 1;
+
+
+
     ctrans->position = v3f(-2, 2, -5);
     ctrans->scale    = v3f(1, 1, 1);
     ctrans->rotation = v3f(0, 0, 0);

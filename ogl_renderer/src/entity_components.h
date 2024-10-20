@@ -32,9 +32,17 @@ typedef struct component_mesh{
     size_t vectex_count;
 }component_mesh;
 
+
+
+
 typedef struct component_material{
     GLuint shader_program;
     GLuint texture_obj; 
+
+    vector3f ambient;
+    vector3f diffuse;
+    vector3f specular;  
+    float shininnes;
 } component_material;
 
 //component marker

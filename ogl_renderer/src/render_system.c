@@ -12,6 +12,10 @@ void render_system_render(ecs ecs, window w, camera main_camera){
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    //ambient component light
+    glVertexAttrib4f(3, 1, 1, 1, 1.0);
+
+    vector3f light_source_position = v3f(-2, 2, -5);
 
     darray qres = ecs_query(ecs, component_transform, component_mesh, component_material, component_renderable);
     for(uint64_t i = 0; i < darray_lenght(qres); ++i){
@@ -28,10 +32,8 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cmesh->ebo);
 
         glEnableVertexAttribArray(0);
-
-        //ambient component light
-        float light_strenght = 0.4;
-        glVertexAttrib4f(3, light_strenght, light_strenght, light_strenght, 1.0);
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
 
         bool has_texture = cmat->texture_obj > 0;
         GLint has_texture_loc  = glGetUniformLocation(cmat->shader_program, "has_texture");        
@@ -48,6 +50,28 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         GLint model_loc      = glGetUniformLocation(cmat->shader_program, "model");
         GLint view_loc       = glGetUniformLocation(cmat->shader_program, "view");
         GLint projection_loc = glGetUniformLocation(cmat->shader_program, "projection");    
+        GLint light_source_position_loc = glGetUniformLocation(cmat->shader_program, "light_source_position");
+
+        //material structure inside fragment shader
+        GLint mat_ambient_loc   = glGetUniformLocation(cmat->shader_program, "mat.ambient");
+        if(mat_ambient_loc == -1){
+            LOG_WARN("cannot find mat_ambient_location");
+        }
+        GLint mat_diffuse_loc   = glGetUniformLocation(cmat->shader_program, "mat.diffuse");
+        if(mat_diffuse_loc == -1){
+            LOG_WARN("cannot find mat_diffuse_location");
+        }
+
+        GLint mat_specular_loc  = glGetUniformLocation(cmat->shader_program, "mat.specular");
+        if(mat_specular_loc == -1){
+            LOG_WARN("cannot find mat_specular_location");
+        }
+
+        GLint mat_shininess_loc = glGetUniformLocation(cmat->shader_program, "mat.shininess");                
+        if(mat_shininess_loc == -1){
+            LOG_WARN("cannot find mat_shininess_locaction");
+        }
+
 
         matrix4f view = win_get_view(w);
         matrix4f model = mat4f_id(1);
@@ -59,15 +83,39 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, projection.m);
         glUniformMatrix4fv(model_loc, 1, GL_FALSE, model.m);
 
+
+        // light source position
+        glUniform3f(light_source_position_loc,
+                    light_source_position.x,
+                    light_source_position.y,
+                    light_source_position.z);
+        
+        glUniform3f(mat_ambient_loc,
+                    cmat->ambient.x,
+                    cmat->ambient.y,
+                    cmat->ambient.z);
+
+        glUniform3f(mat_diffuse_loc,
+                    cmat->diffuse.x,
+                    cmat->diffuse.y,
+                    cmat->diffuse.z);
+
+        glUniform3f(mat_specular_loc,
+                    cmat->specular.x,
+                    cmat->specular.y,
+                    cmat->specular.z);
+
+        glUniform1f(mat_shininess_loc, cmat->shininnes);
+
         
         glDrawElements(GL_TRIANGLES, cmesh->vectex_count, GL_UNSIGNED_INT, 0 /*last parameter deprecated*/);
-
         glBindVertexArray(0);
         glUseProgram(0);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
         //if our value defined as glVertexAttrib4v, then we dont need to enable or disable atribArray
-        // glDisableVertexAttribArray(2);
+        // glDisableVertexAttribArray(3);
     } 
 }
