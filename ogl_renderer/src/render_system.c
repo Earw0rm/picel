@@ -14,8 +14,12 @@ void render_system_render(ecs ecs, window w, camera main_camera){
 
     //ambient component light
     glVertexAttrib4f(3, 1, 1, 1, 1.0);
-
+    
+    //todo crunch
     vector3f light_source_position = v3f(-2, 2, -5);
+    vector3f light_ambient         = v3f(1, 1, 1);
+    vector3f light_diffuse         = v3f(1, 1, 1);
+    vector3f light_specular        = v3f(1, 1, 1);        
 
     darray qres = ecs_query(ecs, component_transform, component_mesh, component_material, component_renderable);
     for(uint64_t i = 0; i < darray_lenght(qres); ++i){
@@ -50,7 +54,6 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         GLint model_loc      = glGetUniformLocation(cmat->shader_program, "model");
         GLint view_loc       = glGetUniformLocation(cmat->shader_program, "view");
         GLint projection_loc = glGetUniformLocation(cmat->shader_program, "projection");    
-        GLint light_source_position_loc = glGetUniformLocation(cmat->shader_program, "light_source_position");
 
         //material structure inside fragment shader
         GLint mat_ambient_loc   = glGetUniformLocation(cmat->shader_program, "mat.ambient");
@@ -72,6 +75,27 @@ void render_system_render(ecs ecs, window w, camera main_camera){
             LOG_WARN("cannot find mat_shininess_locaction");
         }
 
+        GLint light_position_loc = glGetUniformLocation(cmat->shader_program, "lig.position");                
+        if(light_position_loc == -1){
+            LOG_WARN("cannot find light position");
+        }
+
+        GLint light_ambient_loc = glGetUniformLocation(cmat->shader_program, "lig.ambient");                
+        if(light_ambient_loc == -1){
+            LOG_WARN("cannot find light_ambient_location");
+        }
+
+        GLint light_diffuse_loc = glGetUniformLocation(cmat->shader_program, "lig.diffuse");                
+        if(light_diffuse_loc == -1){
+            LOG_WARN("cannot find light_diffuse_location");
+        }
+
+        GLint light_specular_loc = glGetUniformLocation(cmat->shader_program, "lig.specular");                
+        if(light_specular_loc == -1){
+            LOG_WARN("cannot find light_specular_location");
+        }
+
+
 
         matrix4f view = win_get_view(w);
         matrix4f model = mat4f_id(1);
@@ -84,12 +108,6 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         glUniformMatrix4fv(model_loc, 1, GL_FALSE, model.m);
 
 
-        // light source position
-        glUniform3f(light_source_position_loc,
-                    light_source_position.x,
-                    light_source_position.y,
-                    light_source_position.z);
-        
         glUniform3f(mat_ambient_loc,
                     cmat->ambient.x,
                     cmat->ambient.y,
@@ -107,6 +125,33 @@ void render_system_render(ecs ecs, window w, camera main_camera){
 
         glUniform1f(mat_shininess_loc, cmat->shininnes);
 
+
+        vector4f tmp_lpos = v4f(light_source_position.x, light_source_position.y, light_source_position.z, 1.0);
+        tmp_lpos = mdotv4(view, mdotv4(model, tmp_lpos));
+        light_source_position.x = tmp_lpos.x;
+        light_source_position.y = tmp_lpos.y;
+        light_source_position.z = tmp_lpos.z;
+
+        // light source position
+        glUniform3f(light_position_loc,
+                    light_source_position.x,
+                    light_source_position.y,
+                    light_source_position.z);
+        
+        glUniform3f(light_ambient_loc,
+                    light_ambient.x,
+                    light_ambient.y,
+                    light_ambient.z);
+
+        glUniform3f(light_diffuse_loc,
+                    light_diffuse.x,
+                    light_diffuse.y,
+                    light_diffuse.z);
+
+        glUniform3f(light_specular_loc,
+                    light_specular.x,
+                    light_specular.y,
+                    light_specular.z);
         
         glDrawElements(GL_TRIANGLES, cmesh->vectex_count, GL_UNSIGNED_INT, 0 /*last parameter deprecated*/);
         glBindVertexArray(0);
