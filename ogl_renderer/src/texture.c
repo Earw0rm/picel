@@ -21,11 +21,11 @@ int8_t texture_init(const char* path, texture* tp){
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        /* how we store inside gpu*/GL_RGB,
+        /* how we store inside gpu*/GL_RGBA,
         width,
         height,
         0,
-        /*format of stb image*/ GL_RGB,
+        /*format of stb image*/ GL_RGBA,
         GL_UNSIGNED_BYTE,
         img_data
     );

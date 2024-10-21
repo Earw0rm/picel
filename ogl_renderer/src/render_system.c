@@ -3,12 +3,12 @@
 #include "picel_math.h"
 
 
-void render_system_render(ecs ecs, window w, camera main_camera){
+void render_system_render(ecs ecs, window w, camera main_camera, shader gs, GLuint dvao){
     // matrix4f view = camera_get_view(main_camera);
 
     float aspect_ratio = win_get_aspect_ratio(w);
     matrix4f projection = mat4f_projection(20.0f, aspect_ratio, 1, 100);
-
+    matrix4f view = win_get_view(w);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -20,6 +20,32 @@ void render_system_render(ecs ecs, window w, camera main_camera){
     vector3f light_ambient         = v3f(1, 1, 1);
     vector3f light_diffuse         = v3f(1, 1, 1);
     vector3f light_specular        = v3f(1, 1, 1);        
+
+
+    // draw grid    
+    GLenum err;
+    matrix4f vp = mdotm4(projection, view);
+
+    glUseProgram(gs.program);
+    glBindVertexArray(dvao);
+
+    GLint vp_loc = glGetUniformLocation(gs.program, "world_projection");
+    if(vp_loc == -1){
+        LOG_FATAL("failed to find wolrd_projection matrix inside grid shader");
+    }                
+
+    glUniformMatrix4fv(vp_loc, 1, GL_FALSE, vp.m);
+    if((err = glGetError()) != GL_NO_ERROR){
+        LOG_FATAL("Failed to draw grid %i", err);
+    }
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    if((err = glGetError()) != GL_NO_ERROR){
+        LOG_FATAL("Failed to draw grid %x", err);
+    }
+    glBindVertexArray(0);
+    // LOG_INFO("draw successfull?");
+
 
     darray qres = ecs_query(ecs, component_transform, component_mesh, component_material, component_renderable);
     for(uint64_t i = 0; i < darray_lenght(qres); ++i){
@@ -97,7 +123,7 @@ void render_system_render(ecs ecs, window w, camera main_camera){
 
 
 
-        matrix4f view = win_get_view(w);
+
         matrix4f model = mat4f_id(1);
         model = mat4f_scale(model, ctrans->scale.x, ctrans->scale.y, ctrans->scale.z);
         model = mat4f_rotate(model, ctrans->rotation.x, ctrans->rotation.y, ctrans->rotation.z);
@@ -163,4 +189,7 @@ void render_system_render(ecs ecs, window w, camera main_camera){
         //if our value defined as glVertexAttrib4v, then we dont need to enable or disable atribArray
         // glDisableVertexAttribArray(3);
     } 
+
+
+
 }

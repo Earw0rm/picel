@@ -15,6 +15,10 @@ out vec2 tex_coord;
 out vec4 fragment_in_color;
 out vec3 fragment_normals;
 out vec3 fragment_position_of_fragment;
+
+
+
+
 void main(){
 
     gl_Position =  projection * view * model * vec4(in_pos, 1.0);

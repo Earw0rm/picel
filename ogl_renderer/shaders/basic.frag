@@ -6,7 +6,14 @@ struct material{
     vec3 specular;
     float shininess;
 };
+
 uniform material mat;
+
+// struct material_v2{
+//     sampler2D diffuse; // in all time ambient is equal to diffuse
+//     vec3 specular;
+//     float shininess;
+// };
 
 
 struct light{
@@ -27,6 +34,8 @@ uniform bool has_texture;
 uniform sampler2D g_sampler;
 
 
+
+
 void main(){
     vec3 norm = normalize(fragment_normals);
     vec3 light_direction = normalize(/*fragment_light_source_position*/lig.position - fragment_position_of_fragment);         
@@ -39,8 +48,8 @@ void main(){
     float spec = pow(max(dot(view_direction, reflection_dir), 0.0), mat.shininess);
     vec4 specular_component =  vec4(mat.specular, 1) * spec * vec4(lig.specular, 1);
 
-
     vec4 ambient_component = vec4(mat.ambient, 1) * vec4(lig.ambient, 1); 
+    
     //sample texture color using g_sampler. basic color set to (1, 1, 1, 1) (white)
     if(has_texture){
         out_color = (ambient_component + diffusion_component + specular_component) * texture(g_sampler, tex_coord);

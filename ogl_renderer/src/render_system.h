@@ -6,6 +6,6 @@
 #include "window.h"
 
 
-void render_system_render(ecs ecs, window w, camera main_camera);
+void render_system_render(ecs ecs, window w, camera main_camera, shader gs, GLuint dvao);
 
 #endif 

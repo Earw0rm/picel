@@ -32,7 +32,8 @@ enum shader_status{
 };
 
 int8_t shader_init(const char* vert_path, 
-                   const char* frag_path,
+                   const char* frag_path, 
+                   bool check_location,
                    shader* sp);
 
 

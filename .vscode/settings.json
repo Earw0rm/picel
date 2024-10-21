@@ -60,7 +60,8 @@
         "__locale": "c",
         "locale": "c",
         "camera.h": "c",
-        "mesh.h": "c"
+        "mesh.h": "c",
+        "span": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

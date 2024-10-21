@@ -101,13 +101,15 @@ int main(int argc, char const *argv[]){
         ecs ecs = world_get_ecs();
         camera main_camera = world_get_main_camera();
         window main_window = world_get_main_window();
+        shader gs = world_get_grid_shader();
+        GLuint vao = world_get_dummy_vao();
 
         gui_system_init(main_window, 512 * 1024, 128 * 1024);
 
 
         while(!win_should_close(main_window)){
 
-            render_system_render(ecs, main_window, main_camera);
+            render_system_render(ecs, main_window, main_camera, gs, vao);
             gui_system_render(main_window);
 
             win_swap_buffers(main_window);

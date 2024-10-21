@@ -105,7 +105,7 @@ create_shader_and_compile(GLenum shader_type, const int32_t shader_data_sz, cons
 
 
 int8_t 
-shader_init(const char* vert_path, const char* frag_path, shader* sp){
+shader_init(const char* vert_path, const char* frag_path, bool check_location, shader* sp){
     int8_t res = SHADER_STATUS_OK;
     GLint frag_shader_id = 0;
     GLint vert_shader_id = 0;
@@ -178,32 +178,34 @@ shader_init(const char* vert_path, const char* frag_path, shader* sp){
     // these 3 uniforms should be in any custom shader.
     // We don't use the location outside of this class. They are just needed for testing.
     // uniform need to be called after program link
-    sp->uniform_location_model = glGetUniformLocation(sp->program, "model");
-    if(sp->uniform_location_model == -1){
-        LOG_FATAL("Cannot find uniform with name model. Shader must include uniform with this name");
-        res = SHADER_STATUS_BAD_UNIFORM;
-        goto shader_cleanup;
-    }
+    if(check_location){
+        sp->uniform_location_model = glGetUniformLocation(sp->program, "model");
+        if(sp->uniform_location_model == -1){
+            LOG_FATAL("Cannot find uniform with name model. Shader must include uniform with this name");
+            res = SHADER_STATUS_BAD_UNIFORM;
+            goto shader_cleanup;
+        }
 
-    sp->uniform_location_projection = glGetUniformLocation(sp->program, "projection");
-    if(sp->uniform_location_projection == -1){
-        LOG_FATAL("Cannot find uniform with name projection. Shader must include uniform with this name");
-        res = SHADER_STATUS_BAD_UNIFORM;
-        goto shader_cleanup;
-    }    
+        sp->uniform_location_projection = glGetUniformLocation(sp->program, "projection");
+        if(sp->uniform_location_projection == -1){
+            LOG_FATAL("Cannot find uniform with name projection. Shader must include uniform with this name");
+            res = SHADER_STATUS_BAD_UNIFORM;
+            goto shader_cleanup;
+        }    
 
-    sp->uniform_location_view = glGetUniformLocation(sp->program, "view");
-    if(sp->uniform_location_view == -1){
-        LOG_FATAL("Cannot find uniform with name view. Shader must include uniform with this name");
-        res = SHADER_STATUS_BAD_UNIFORM;
-        goto shader_cleanup;
-    }
+        sp->uniform_location_view = glGetUniformLocation(sp->program, "view");
+        if(sp->uniform_location_view == -1){
+            LOG_FATAL("Cannot find uniform with name view. Shader must include uniform with this name");
+            res = SHADER_STATUS_BAD_UNIFORM;
+            goto shader_cleanup;
+        }
 
-    sp->uniform_location_g_sampler = glGetUniformLocation(sp->program, "g_sampler");
-    if(sp->uniform_location_g_sampler == -1){
-        LOG_FATAL("Cannot find uniform with name g_sampler. Shader must include uniform with this name");
-        res = SHADER_STATUS_BAD_UNIFORM;
-        goto shader_cleanup;
+        sp->uniform_location_g_sampler = glGetUniformLocation(sp->program, "g_sampler");
+        if(sp->uniform_location_g_sampler == -1){
+            LOG_FATAL("Cannot find uniform with name g_sampler. Shader must include uniform with this name");
+            res = SHADER_STATUS_BAD_UNIFORM;
+            goto shader_cleanup;
+        }
     }
 
 

@@ -16,7 +16,12 @@ void world_destroy(void);
 ecs world_get_ecs(void);
 camera world_get_main_camera(void);
 shader world_get_basic_shader(void);
+shader world_get_grid_shader(void);
+
 mesh world_get_basic_mesh(void);
 window world_get_main_window(void);
 texture world_get_basic_texture(void);
+
+GLuint world_get_dummy_vao(void);
+
 #endif 
