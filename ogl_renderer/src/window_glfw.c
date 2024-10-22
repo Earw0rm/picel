@@ -203,7 +203,7 @@ win_init(const char* title, uint32_t height, uint32_t width){
     arcball_camera.global_width  = width;
 
 
-    arcball_camera.camera_position = v3f(0, 0, arcball_camera.radius);
+    arcball_camera.camera_position = v3f(0, 50, arcball_camera.radius);
     // we look at 0
     arcball_camera.camera_direction = vec3f_diff(v3f(0, 0, 0), arcball_camera.camera_position);
     arcball_camera.camera_up = v3f(0, 1, 0);

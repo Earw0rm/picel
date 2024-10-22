@@ -22,29 +22,29 @@ void render_system_render(ecs ecs, window w, camera main_camera, shader gs, GLui
     vector3f light_specular        = v3f(1, 1, 1);        
 
 
-    // draw grid    
-    GLenum err;
-    matrix4f vp = mdotm4(projection, view);
+    // // draw grid    
+    // GLenum err;
+    // matrix4f vp = mdotm4(projection, view);
 
-    glUseProgram(gs.program);
-    glBindVertexArray(dvao);
+    // glUseProgram(gs.program);
+    // glBindVertexArray(dvao);
 
-    GLint vp_loc = glGetUniformLocation(gs.program, "world_projection");
-    if(vp_loc == -1){
-        LOG_FATAL("failed to find wolrd_projection matrix inside grid shader");
-    }                
+    // GLint vp_loc = glGetUniformLocation(gs.program, "world_projection");
+    // if(vp_loc == -1){
+    //     LOG_FATAL("failed to find wolrd_projection matrix inside grid shader");
+    // }                
 
-    glUniformMatrix4fv(vp_loc, 1, GL_FALSE, vp.m);
-    if((err = glGetError()) != GL_NO_ERROR){
-        LOG_FATAL("Failed to draw grid %i", err);
-    }
+    // glUniformMatrix4fv(vp_loc, 1, GL_FALSE, vp.m);
+    // if((err = glGetError()) != GL_NO_ERROR){
+    //     LOG_FATAL("Failed to draw grid %i", err);
+    // }
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    if((err = glGetError()) != GL_NO_ERROR){
-        LOG_FATAL("Failed to draw grid %x", err);
-    }
-    glBindVertexArray(0);
-    // LOG_INFO("draw successfull?");
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    // if((err = glGetError()) != GL_NO_ERROR){
+    //     LOG_FATAL("Failed to draw grid %x", err);
+    // }
+    // glBindVertexArray(0);
+    // // LOG_INFO("draw successfull?");
 
 
     darray qres = ecs_query(ecs, component_transform, component_mesh, component_material, component_renderable);

@@ -63,15 +63,7 @@ void world_init(void){
         LOG_FATAL("cannot generate dummy vao");
         exit(-1);
     }
-    // glBindVertexArray(store.dummy_vao);
-    // GLuint dummyVBO;
-    // glGenBuffers(1, &dummyVBO);
-    // glBindBuffer(GL_ARRAY_BUFFER, dummyVBO);
-    // float dummy_data[1] = {0.0f};
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(dummy_data), dummy_data, GL_STATIC_DRAW);
-    // glEnableVertexAttribArray(0);
-    // glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    // glDisableVertexAttribArray(0);
+
 
 }
 

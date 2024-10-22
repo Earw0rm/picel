@@ -34,3 +34,6 @@ yasyc:
 clean:
 	make -C ./ogl_renderer clean 
 	make -C ./yasyc clean 
+
+ubuntu-install-libs:
+	sudo apt install assimp-utils libassimp-dev libassimp5

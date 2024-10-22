@@ -10,11 +10,17 @@ const vec3 grid_pos[4] = vec3[4](
 );
 const int grid_pos_indices[6] = int[6](0, 2, 1, 2, 0, 3);
 
+
+
 // projection * world
 uniform mat4 world_projection;
+uniform vec3 camera_world_position;
 
 void main(){
     int index = grid_pos_indices[gl_VertexID];
     vec4 vertex_pos = vec4((grid_pos[index] * 10.0), 1.0);
+    vertex_pos.x += camera_world_position.x;
+    vertex_pos.y += camera_world_position.y;
+    
     gl_Position = world_projection * vertex_pos;
 }
