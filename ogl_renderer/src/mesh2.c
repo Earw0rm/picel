@@ -1,78 +1,23 @@
-#include "amesh.h"
-#include "picel_math.h"
-#include "darray.h"
-#include "shader.h"
-#include <glad/glad.h>
-#include <assimp/cimport.h>     // Plain-C interface
-#include <assimp/scene.h>       // output data structures
-#include <assimp/postprocess.h> // post processing flag (ie aiProcess_Triangulate)
-
-typedef enum {
-    TEXTURE_TYPE_DIFFUSE  = 0, 
-    TEXTURE_TYPE_SPECULAR = 1,
+#include "mesh2.h"
 
 
-    TEXTURE_TYPE_MAX
-} TEXTURE_TYPE;
+/**
+ * load mesh into gpu. Fill vbo/ebo/vao.
+ */
+void mesh_to_gpu(mesh mesh){
+    if(mesh.vao != 0 
+      || mesh.vbo != 0 
+      || mesh.ebo != 0){
+        LOG_WARN("mesh_to_gpu calling twise. VAO : %i, VBO : %i, EBO : %i");
+    }
 
-typedef struct texture {
-    uint32_t id;
-    TEXTURE_TYPE type;
-} texture;
-
-
-static char* texture_type2name[TEXTURE_TYPE_MAX] = {
-    [TEXTURE_TYPE_DIFFUSE]  "material.texture_specular_n", //26
-    [TEXTURE_TYPE_SPECULAR] "material.texture_diffuse__n",
-};
-
-static inline char* ttype2name(TEXTURE_TYPE type, uint8_t texture_num){
-    char* name = texture_type2name[type];
-    name[26] = (char)('0' + texture_num);         
-    return name;
-}
-
-
-
-//mesh
-typedef struct vertex{
-    vector3f position;
-    vector2f texture_coords;
-    vector3f normal;
-} vertex;
-
-
-typedef struct mesh{
-    darray vertices;
-    darray indices;
-    darray textures;
-    GLint vao, ebo, vbo;
-} mesh;
-//mesh end 
-
-
-
-
-typedef struct scene{
-    darray meshes;
-    char* path;
-} scene;
-
-
-typedef struct model{
-    darray meshes;
-    char* dirname;
-} model;
-
-
-void mesh_setup(mesh mesh){
     glGenVertexArrays(1, &mesh.vao);
     glGenBuffers(1, &mesh.vbo);
     glGenBuffers(1, &mesh.ebo);
 
     glBindVertexArray(mesh.vao);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
-    
+ 
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);   
     glBufferData(GL_ARRAY_BUFFER, 
                  darray_lenght(mesh.vertices) * sizeof(vertex),
                  darray_at(mesh.vertices, 0), 
@@ -99,43 +44,8 @@ void mesh_setup(mesh mesh){
     glBindVertexArray(0);
 }
 
-void mesh_draw(mesh mesh, shader sh){
-    glUseProgram(sh.program); // if it is not used yet
-
-
-    uint8_t diffuse_texture_num  = 0;
-    uint8_t specular_texture_num = 0;
-
-    for(uint8_t i = 0; i < darray_lenght(mesh.textures), ++i){
-        glActiveTexture(GL_TEXTURE0 + i);
-        texture* txt = (texture*)darray_at(mesh.textures, i);
-        char* full_name = ttype2name(txt->type, i);
-
-        // uniform sampler2D texture_specular1;
-        GLint loc = glGetUniformLocation(sp->program, full_name);
-        glUniform1i(loc, i);
-
-        glBindTexture(GL_TEXTURE_2D, txt->id);
-    }
-    glActiveTexture(GL_TEXTURE0);
-
-    //draw
-    glBindVertexArray(mesh.vao);
-    glDrawElements(GL_TRIANGLES, darray_lenght(mesh.indices), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-
-}
-
-void model_draw(shader sh, model m){
-    for(int i = 0; i < darray_lenght(m.meshes), ++i){
-        mesh* m = (mesh*) darray_at(m.meshes, i);
-        mesh_draw(*m, sh);
-    }
-}
-
-
 static inline 
-mesh mesh_from_(struct aiMesh* aimesh, const struct aiScene* scene){
+mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene){
     darray vertices = darray_alloc(vertex);
     darray indices  = darray_alloc(GLuint);
     darray textures = darray_alloc(texture);
@@ -218,38 +128,3 @@ mesh mesh_from_(struct aiMesh* aimesh, const struct aiScene* scene){
 
     return mmesh;
 }
-
-static inline 
-void process_ai_node(struct aiNode* node, const struct aiScene* scene, model* m){
-
-    for(uint32_t i = 0; i < node->mNumMeshes; ++i){
-        struct aiMesh* aimesh = scene->mMeshes[node->mMeshes[i]];
-        darray_push_back(m->meshes, process_ai_mesh(aimesh, scene));
-    }
-
-    for(uint32_t i = 0; i < node->mNumChildren; ++i){
-        process_ai_node(node->mChildren[i], scene, m);
-    }
-}
-
-
-amesh amesh_load(const char* filepath){
-    model m;
-    m.meshes = darray_alloc(mesh);
-    m.dirname = "asd"
-
-    const struct aiScene* scene;
-    if((scene = aiImportFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs)) == nullptr 
-        || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE 
-        || scene->mRootNode == nullptr){
-        LOG_FATAL("cannot import scene using asimp: %s", aiGetErrorString());
-        return nullptr;
-    }
-
-    //process scene start hire 
-    process_ai_node(scene->mRootNode, scene, &m);
-    //process scene end hire 
-    aiReleaseImport(scene);
-    return mesh;
-}
-
