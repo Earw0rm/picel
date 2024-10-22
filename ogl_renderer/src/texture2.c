@@ -3,6 +3,7 @@
 #include <assimp/cimport.h>     // Plain-C interface
 #include <assimp/scene.h>       // output data structures
 #include <assimp/postprocess.h> // post processing flag (ie aiProcess_Triangulate)
+#include <string.h>
 
 static char* texture_type2name[TEXTURE_TYPE_MAX] = {
     [TEXTURE_TYPE_DIFFUSE]  "mat.texture_specular_n", //21
@@ -18,11 +19,17 @@ ttype2name(TEXTURE_TYPE type, uint8_t texture_num){
 
 static inline unsigned char* 
 texture_read(const char* work_dir, const char* name){
+    char* concat = malloc(strlen(work_dir) + strlen(name) + 4);
+    strcat(concat, work_dir);
+    strcat(concat, name);
+
+
     // because opengl y axis is flip
     stbi_set_flip_vertically_on_load(1);
     int width = 0, height = 0, /* bits per pixel */ bpp = 0;
 
-    unsigned char* img_data = stbi_load(path, &width, &height, &bpp, 0);
+    unsigned char* img_data = stbi_load(concat, &width, &height, &bpp, 0);
+    free(concat);
     return img_data;
 }
 
@@ -43,6 +50,7 @@ darray textures_from_assimp(struct aiMaterial *mat, aiTextureType type, TEXTURE_
             return nullptr;
         }
 
+        //load texture.../
 
     }
     return textures;
