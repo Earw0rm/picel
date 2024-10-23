@@ -1,6 +1,6 @@
 #include "mesh2.h"
 #include "texture2.h"
-#include "shader.h"
+
 
 typedef struct vertex{
     vector3f position;
@@ -13,10 +13,11 @@ struct mesh_impl{
     darray vertices;
     darray indices;
     darray textures;
-    GLint vao, ebo, vbo;
+    GLuint vao, ebo, vbo;
     bool is_initialized;
 };
-GLint mesh_vao(mesh m){
+
+GLuint mesh_vao(mesh m){
     return m->vao;
 }
 
@@ -33,6 +34,10 @@ void mesh_activate_textures(mesh mesh, shader sh){
             texture_activate(t, specular_texture_num++, sh);
         }
     }
+}
+
+size_t mesh_sizeof(void){
+    return sizeof(struct mesh_impl);
 }
 
 uint64_t mesh_vertices_len(mesh mesh){
@@ -76,11 +81,11 @@ void mesh_to_gpu(mesh mesh){
 
     // texture_coords 
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), offsetof(vertex, texture_coords));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, texture_coords));
 
     // normals 
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), offsetof(vertex, normal));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, normal));
 
     for(uint8_t i = 0; i < darray_lenght(mesh->textures); ++i){
         texture t = (texture) darray_at(mesh->textures, i);
@@ -91,11 +96,11 @@ void mesh_to_gpu(mesh mesh){
     mesh->is_initialized = true;
 }
 
-static inline 
+
 mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const char* workdir){
     darray vertices = darray_alloc(vertex);
     darray indices  = darray_alloc(GLuint);
-    darray textures = darray_alloc_fix(sizeof(struct texture_impl));
+    darray textures = darray_alloc_fix(texture_sizeof());
 
     mesh mmesh = malloc(sizeof(struct mesh_impl));
     mmesh->ebo = 0;
@@ -147,13 +152,13 @@ mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const 
         darray specular_textures = textures_from_assimp(mat, aiTextureType_SPECULAR, TEXTURE_TYPE_SPECULAR, workdir);        
 
         for(uint8_t i = 0; i < darray_lenght(diffuse_textures); ++i){
-            texture t = (texture) darray_at(diffuse_textures, i);
-            darray_emplace_back(textures, t);
+            texture* t = (texture*) darray_at(diffuse_textures, i);
+            darray_push_back(textures, t);
         }
 
         for(uint8_t i = 0; i < darray_lenght(specular_textures); ++i){
-            texture t = (texture) darray_at(specular_textures, i);
-            darray_emplace_back(textures, t);
+            texture* t = (texture*) darray_at(specular_textures, i);
+            darray_push_back(textures, t);
         }
 
         darray_free(diffuse_textures);

@@ -7,20 +7,14 @@
 #include <glad/glad.h>
 #include "shader.h"
 
-typedef enum {
-    TEXTURE_TYPE_DIFFUSE  = 0, 
-    TEXTURE_TYPE_SPECULAR = 1,
 
-
-    TEXTURE_TYPE_MAX
-} TEXTURE_TYPE;
 
 struct texture_impl {
     uint32_t texture_obj;
     TEXTURE_TYPE type;
     unsigned char* texture_data;
     char* path; // for comparing with another textures
-    int width, height, bpp;
+    int width, height, bpp;enum
     bool is_initialized;
 };
 
@@ -55,17 +49,20 @@ texture_read(const char* work_dir, const char* name, int* width, int* height, in
     // because opengl y axis is flip
     stbi_set_flip_vertically_on_load(1);
 
-    unsigned char* img_data = stbi_load(concat, width, height, bpp, 0);
+    unsigned char* img_data = stbi_enumload(concat, width, height, bpp, 0);
     free(concat);
     return img_data;
 }
 
+size_t texture_sizeof(void){
+    return sizeof(texture_impl);
+}
 
 /**
  * @return darray<texture>
  */
-darray textures_from_assimp(struct aiMaterial *mat, aiTextureType type, TEXTURE_TYPE internal_type, const char* workdir){
-    darray textures = darray_alloc_fix(sizeof(struct texture_impl));
+darray textures_from_assimp(struct aiMaterial *mat,enum aiTextureType type, TEXTURE_TYPE internal_type, const char* workdir){
+    darray textures = darray_alloc(sizeof(struct texture_impl));
     uint32_t text_count = aiGetMaterialTextureCount(mat, type);
     texture emplace_texture = malloc(sizeof(struct texture_impl));
 

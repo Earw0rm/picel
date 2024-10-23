@@ -17,6 +17,9 @@ struct scene_impl{
     char* workdir; //
 };
 
+size_t scene_sizeof(void){
+    return sizeof(struct scene_impl);
+}
 
 darray scene_get_meshes(scene s){
     return s->meshes;
