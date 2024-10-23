@@ -1,12 +1,10 @@
 #include "texture2.h"
 #include "stb_image.h"
-#include <assimp/cimport.h>     // Plain-C interface
-#include <assimp/scene.h>       // output data structures
-#include <assimp/postprocess.h> // post processing flag (ie aiProcess_Triangulate)
+
 #include <string.h>
 #include <glad/glad.h>
 #include "shader.h"
-
+#include "logger.h"
 
 
 struct texture_impl {
@@ -14,25 +12,25 @@ struct texture_impl {
     TEXTURE_TYPE type;
     unsigned char* texture_data;
     char* path; // for comparing with another textures
-    int width, height, bpp;enum
+    int width, height, bpp;
     bool is_initialized;
 };
 
-bool texture_is_diffuse(texture t){
+bool texture_is_diffuse(texture2 t){
     return t->type == TEXTURE_TYPE_DIFFUSE;
 }
 
-bool texture_is_specular(texture t){
+bool texture_is_specular(texture2 t){
     return t->type == TEXTURE_TYPE_SPECULAR;
 }
 
 static char* texture_type2name[TEXTURE_TYPE_MAX] = {
-    [TEXTURE_TYPE_DIFFUSE]  "mat.texture_specular_n", //21
-    [TEXTURE_TYPE_SPECULAR] "mat.texture_diffuse__n",
+    [TEXTURE_TYPE_DIFFUSE]  = "mat.texture_specular_n", //21
+    [TEXTURE_TYPE_SPECULAR] = "mat.texture_diffuse__n",
 };
 
 const char* 
-texture_get_name(texture tp, uint8_t cell){
+texture_get_name(texture2 tp, uint8_t cell){
     char* name = texture_type2name[tp->type];
     name[21] = (char)('0' + cell);         
     return name;
@@ -49,22 +47,22 @@ texture_read(const char* work_dir, const char* name, int* width, int* height, in
     // because opengl y axis is flip
     stbi_set_flip_vertically_on_load(1);
 
-    unsigned char* img_data = stbi_enumload(concat, width, height, bpp, 0);
+    unsigned char* img_data = stbi_load(concat, width, height, bpp, 0);
     free(concat);
     return img_data;
 }
 
 size_t texture_sizeof(void){
-    return sizeof(texture_impl);
+    return sizeof(struct texture_impl);
 }
 
 /**
  * @return darray<texture>
  */
-darray textures_from_assimp(struct aiMaterial *mat,enum aiTextureType type, TEXTURE_TYPE internal_type, const char* workdir){
-    darray textures = darray_alloc(sizeof(struct texture_impl));
+darray textures_from_assimp(struct aiMaterial *mat, enum aiTextureType type, TEXTURE_TYPE internal_type, const char* workdir){
+    darray textures = darray_alloc(texture2);
     uint32_t text_count = aiGetMaterialTextureCount(mat, type);
-    texture emplace_texture = malloc(sizeof(struct texture_impl));
+
 
     for(uint32_t i = 0; i < text_count; ++i){
         struct aiString path; 
@@ -83,24 +81,20 @@ darray textures_from_assimp(struct aiMaterial *mat,enum aiTextureType type, TEXT
             darray_free(textures);
             return nullptr;
         }
-
-        emplace_texture->path           = path;
+        texture2 emplace_texture = malloc(sizeof(struct texture_impl));
+        emplace_texture->path           = path.data;
         emplace_texture->texture_data   = texture_data;
         emplace_texture->is_initialized = false;
         emplace_texture->type           = internal_type;
         emplace_texture->width          = width;
         emplace_texture->height         = height;
         emplace_texture->bpp            = bpp;
-
-        //after that array contain copy of the texture memory
-        darray_emplace_back(textures, emplace_texture);
-
+        darray_push_back(textures, emplace_texture);
     }
-    free(emplace_texture);    
     return textures;
 }
 
-void texture_to_gpu(texture tp){
+void texture_to_gpu(texture2 tp){
     if(tp->is_initialized) return;
     glGenTextures(1, &tp->texture_obj);
     glBindTexture(GL_TEXTURE_2D, tp->texture_obj);
@@ -127,7 +121,7 @@ void texture_to_gpu(texture tp){
     tp->is_initialized = true;
 }
 
-void texture_activate(texture tp, uint8_t cell, shader sp,){
+void texture_activate(texture2 tp, uint8_t cell, shader sp){
     if(!tp->is_initialized){
         texture_to_gpu(tp);
     }
@@ -136,14 +130,15 @@ void texture_activate(texture tp, uint8_t cell, shader sp,){
     const char* full_name = texture_get_name(tp, cell);
 
     // uniform sampler2D texture_specular1;
-    GLint loc = glGetUniformLocation(sp->program, full_name);
+    GLint loc = glGetUniformLocation(sp.program, full_name);
     glUniform1i(loc, cell);
     glBindTexture(GL_TEXTURE_2D, tp->texture_obj);
 }
 
-void texture_destroy(texture tp){
+void texture2_destroy(texture2 tp){
     if(tp->texture_data != nullptr){
         stbi_image_free(tp->texture_data);
     }
     glDeleteTextures(1, &tp->texture_obj);
+    free(tp);
 }

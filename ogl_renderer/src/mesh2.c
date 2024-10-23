@@ -17,21 +17,21 @@ struct mesh_impl{
     bool is_initialized;
 };
 
-GLuint mesh_vao(mesh m){
+GLuint mesh_vao(mesh2 m){
     return m->vao;
 }
 
-void mesh_activate_textures(mesh mesh, shader sh){
+void mesh_activate_textures(mesh2 mesh, shader sh){
     // we want to do something
     uint8_t diffuse_texture_num  = 0;
     uint8_t specular_texture_num = 0;
 
     for(uint8_t i = 0; i < darray_lenght(mesh->textures); ++i){
-        texture t = (texture)darray_at(mesh->textures, i);
-        if(texture_is_diffuse(t)){
-            texture_activate(t, diffuse_texture_num++, sh);
-        }else if(texture_is_specular(t)){
-            texture_activate(t, specular_texture_num++, sh);
+        texture2 *t = (texture2 *)darray_at(mesh->textures, i);
+        if(texture_is_diffuse(*t)){
+            texture_activate(*t, diffuse_texture_num++, sh);
+        }else if(texture_is_specular(*t)){
+            texture_activate(*t, specular_texture_num++, sh);
         }
     }
 }
@@ -40,13 +40,13 @@ size_t mesh_sizeof(void){
     return sizeof(struct mesh_impl);
 }
 
-uint64_t mesh_vertices_len(mesh mesh){
+uint64_t mesh_vertices_len(mesh2 mesh){
     return darray_lenght(mesh->vertices);
 }
-uint64_t mesh_indices_len(mesh mesh){
+uint64_t mesh_indices_len(mesh2 mesh){
     return darray_lenght(mesh->indices);
 }
-uint64_t mesh_textures_len(mesh mesh){
+uint64_t mesh_textures_len(mesh2 mesh){
     return darray_lenght(mesh->textures);
 }
 
@@ -54,7 +54,7 @@ uint64_t mesh_textures_len(mesh mesh){
  * load mesh into gpu. Fill vbo/ebo/vao.
  * If mesh has textures, load them into gpu too.
  */
-void mesh_to_gpu(mesh mesh){
+void mesh_to_gpu(mesh2 mesh){
     if(mesh->is_initialized) return;
 
     glGenVertexArrays(1, &mesh->vao);
@@ -88,8 +88,8 @@ void mesh_to_gpu(mesh mesh){
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, normal));
 
     for(uint8_t i = 0; i < darray_lenght(mesh->textures); ++i){
-        texture t = (texture) darray_at(mesh->textures, i);
-        texture_to_gpu(t);
+        texture2* t = (texture2*) darray_at(mesh->textures, i);
+        texture_to_gpu(*t);
     }
 
     glBindVertexArray(0);   
@@ -97,12 +97,12 @@ void mesh_to_gpu(mesh mesh){
 }
 
 
-mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const char* workdir){
+mesh2 mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const char* workdir){
     darray vertices = darray_alloc(vertex);
     darray indices  = darray_alloc(GLuint);
-    darray textures = darray_alloc_fix(texture_sizeof());
+    darray textures = darray_alloc(texture2);
 
-    mesh mmesh = malloc(sizeof(struct mesh_impl));
+    mesh2 mmesh = malloc(sizeof(struct mesh_impl));
     mmesh->ebo = 0;
     mmesh->vao = 0;
     mmesh->ebo = 0;
@@ -152,13 +152,13 @@ mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const 
         darray specular_textures = textures_from_assimp(mat, aiTextureType_SPECULAR, TEXTURE_TYPE_SPECULAR, workdir);        
 
         for(uint8_t i = 0; i < darray_lenght(diffuse_textures); ++i){
-            texture* t = (texture*) darray_at(diffuse_textures, i);
-            darray_push_back(textures, t);
+            texture2* t = (texture2*) darray_at(diffuse_textures, i);
+            darray_push_back(textures, *t);
         }
 
         for(uint8_t i = 0; i < darray_lenght(specular_textures); ++i){
-            texture* t = (texture*) darray_at(specular_textures, i);
-            darray_push_back(textures, t);
+            texture2* t = (texture2*) darray_at(specular_textures, i);
+            darray_push_back(textures, *t);
         }
 
         darray_free(diffuse_textures);

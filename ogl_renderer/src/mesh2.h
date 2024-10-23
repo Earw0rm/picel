@@ -10,16 +10,16 @@
 #include <assimp/scene.h>       // output data structures
 #include <assimp/postprocess.h> // post processing flag (ie aiProcess_Triangulate)
 
-typedef struct mesh_impl* mesh;
+typedef struct mesh_impl* mesh2;
 
 
-GLuint mesh_vao(mesh m);
-void mesh_to_gpu(mesh mesh);
-mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const char* workdir);
-uint64_t mesh_vertices_len(mesh mesh);
-uint64_t mesh_indices_len(mesh mesh);
-uint64_t mesh_textures_len(mesh mesh);
-void mesh_activate_textures(mesh mesh, shader sh);
+GLuint mesh_vao(mesh2 m);
+void mesh_to_gpu(mesh2 mesh);
+mesh2 mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const char* workdir);
+uint64_t mesh_vertices_len(mesh2 mesh);
+uint64_t mesh_indices_len(mesh2 mesh);
+uint64_t mesh_textures_len(mesh2 mesh);
+void mesh_activate_textures(mesh2 mesh, shader sh);
 
 // runtime only
 size_t mesh_sizeof(void);

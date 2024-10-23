@@ -1,4 +1,3 @@
-#include "amesh.h"
 #include "picel_math.h"
 
 #include "shader.h"
@@ -13,7 +12,7 @@
 
 struct scene_impl{
     darray meshes;
-    char* path;
+    const char* path;
     char* workdir; //
 };
 
@@ -33,7 +32,7 @@ void process_ai_node(struct aiNode* node, const struct aiScene* ais, scene inter
     
     for(uint32_t i = 0; i < node->mNumMeshes; ++i){
         struct aiMesh* aimesh = ais->mMeshes[node->mMeshes[i]];
-        darray_emplace_back(internal_scene->meshes, mesh_from_assimp(aimesh, ais, internal_scene->workdir));
+        darray_push_back(internal_scene->meshes, mesh_from_assimp(aimesh, ais, internal_scene->workdir));
     }
 
     for(uint32_t i = 0; i < node->mNumChildren; ++i){
@@ -59,7 +58,7 @@ dir_from_path(const char* path) {
 
 scene scene_load(const char* filepath){
     scene internal_scene = malloc(sizeof(struct scene_impl));
-    internal_scene->meshes = darray_alloc_fix(sizeof(struct mesh_impl));
+    internal_scene->meshes = darray_alloc_fix(mesh_sizeof());
     internal_scene->path = filepath;
     internal_scene->workdir = dir_from_path(filepath);
 

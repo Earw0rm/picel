@@ -200,7 +200,7 @@ void render_system_render(ecs ecs, window w, camera main_camera, shader gs, GLui
 
 
 // renderer start
-void render_mesh(mesh mesh, shader sh){
+void render_mesh(mesh2 mesh, shader sh){
     glUseProgram(sh.program); // if it is not used yet
     mesh_to_gpu(mesh);
 
@@ -217,8 +217,8 @@ void render_mesh(mesh mesh, shader sh){
 
 void render_scene(shader sh, scene s){
     darray meshes = scene_get_meshes(s);
-    for(int i = 0; i < darray_lenght(meshes), ++i){
-        mesh m = (mesh) darray_at(meshes, i);
-        render_mesh(m, sh);
+    for(int i = 0; i < darray_lenght(meshes); ++i){
+        mesh2* m = (mesh2*) darray_at(meshes, i);
+        render_mesh(*m, sh);
     }
 }
