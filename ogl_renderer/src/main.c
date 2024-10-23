@@ -103,6 +103,7 @@ int main(int argc, char const *argv[]){
         [[gnu::unused]]camera main_camera = world_get_main_camera();
         [[gnu::unused]]window main_window = world_get_main_window();
         [[gnu::unused]]shader gs = world_get_grid_shader();
+        [[gnu::unused]]shader bs = world_get_basic_shader();
         [[gnu::unused]]GLuint vao = world_get_dummy_vao();
         [[gnu::unused]]scene scene = world_get_scene();
 
@@ -112,7 +113,7 @@ int main(int argc, char const *argv[]){
         while(!win_should_close(main_window)){
 
             // render_system_render(ecs, main_window, main_camera, gs, vao);
-            render_system_render2(scene, main_window, main_camera, gs);
+            render_system_render2(scene, main_window, main_camera, bs);
             gui_system_render(main_window);
 
             win_swap_buffers(main_window);
