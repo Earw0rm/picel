@@ -1,32 +1,73 @@
 #include "mesh2.h"
+#include "texture2.h"
+#include "shader.h"
 
+typedef struct vertex{
+    vector3f position;
+    vector2f texture_coords;
+    vector3f normal;
+} vertex;
+
+
+struct mesh_impl{
+    darray vertices;
+    darray indices;
+    darray textures;
+    GLint vao, ebo, vbo;
+    bool is_initialized;
+};
+GLint mesh_vao(mesh m){
+    return m->vao;
+}
+
+void mesh_activate_textures(mesh mesh, shader sh){
+    // we want to do something
+    uint8_t diffuse_texture_num  = 0;
+    uint8_t specular_texture_num = 0;
+
+    for(uint8_t i = 0; i < darray_lenght(mesh->textures); ++i){
+        texture t = (texture)darray_at(mesh->textures, i);
+        if(texture_is_diffuse(t)){
+            texture_activate(t, diffuse_texture_num++, sh);
+        }else if(texture_is_specular(t)){
+            texture_activate(t, specular_texture_num++, sh);
+        }
+    }
+}
+
+uint64_t mesh_vertices_len(mesh mesh){
+    return darray_lenght(mesh->vertices);
+}
+uint64_t mesh_indices_len(mesh mesh){
+    return darray_lenght(mesh->indices);
+}
+uint64_t mesh_textures_len(mesh mesh){
+    return darray_lenght(mesh->textures);
+}
 
 /**
  * load mesh into gpu. Fill vbo/ebo/vao.
+ * If mesh has textures, load them into gpu too.
  */
 void mesh_to_gpu(mesh mesh){
-    if(mesh.vao != 0 
-      || mesh.vbo != 0 
-      || mesh.ebo != 0){
-        LOG_WARN("mesh_to_gpu calling twise. VAO : %i, VBO : %i, EBO : %i");
-    }
+    if(mesh->is_initialized) return;
 
-    glGenVertexArrays(1, &mesh.vao);
-    glGenBuffers(1, &mesh.vbo);
-    glGenBuffers(1, &mesh.ebo);
+    glGenVertexArrays(1, &mesh->vao);
+    glGenBuffers(1, &mesh->vbo);
+    glGenBuffers(1, &mesh->ebo);
 
-    glBindVertexArray(mesh.vao);
+    glBindVertexArray(mesh->vao);
  
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);   
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);   
     glBufferData(GL_ARRAY_BUFFER, 
-                 darray_lenght(mesh.vertices) * sizeof(vertex),
-                 darray_at(mesh.vertices, 0), 
+                 darray_lenght(mesh->vertices) * sizeof(vertex),
+                 darray_at(mesh->vertices, 0), 
                  GL_STATIC_DRAW);    
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
     glBufferData(GL_ARRAY_BUFFER, 
-                 darray_lenght(mesh.indices) * sizeof(GLuint),
-                 darray_at(mesh.indices, 0), 
+                 darray_lenght(mesh->indices) * sizeof(GLuint),
+                 darray_at(mesh->indices, 0), 
                  GL_STATIC_DRAW);    
 
     // vertex positions 
@@ -41,22 +82,28 @@ void mesh_to_gpu(mesh mesh){
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), offsetof(vertex, normal));
 
-    glBindVertexArray(0);
+    for(uint8_t i = 0; i < darray_lenght(mesh->textures); ++i){
+        texture t = (texture) darray_at(mesh->textures, i);
+        texture_to_gpu(t);
+    }
+
+    glBindVertexArray(0);   
+    mesh->is_initialized = true;
 }
 
 static inline 
-mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene){
+mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene, const char* workdir){
     darray vertices = darray_alloc(vertex);
     darray indices  = darray_alloc(GLuint);
-    darray textures = darray_alloc(texture);
+    darray textures = darray_alloc_fix(sizeof(struct texture_impl));
 
-    mesh mmesh;
-    mmesh.ebo = 0;
-    mmesh.vao = 0;
-    mmesh.ebo = 0;
-    mmesh.vertices = vertices;
-    mmesh.indices  = indices;
-    mmesh.textures = textures;
+    mesh mmesh = malloc(sizeof(struct mesh_impl));
+    mmesh->ebo = 0;
+    mmesh->vao = 0;
+    mmesh->ebo = 0;
+    mmesh->vertices = vertices;
+    mmesh->indices  = indices;
+    mmesh->textures = textures;
 
 
     for(uint32_t i = 0; i < aimesh->mNumVertices; ++i){
@@ -96,33 +143,21 @@ mesh mesh_from_assimp(struct aiMesh* aimesh, const struct aiScene* scene){
     
     if(aimesh->mMaterialIndex >= 0){
         struct aiMaterial* mat = scene->mMaterials[aimesh->mMaterialIndex];
-        // load diffuse and specular textures
-        // A material object internally stores an array of 
-        // texture locations for each texture type.
+        darray diffuse_textures = textures_from_assimp(mat, aiTextureType_DIFFUSE, TEXTURE_TYPE_DIFFUSE, workdir);
+        darray specular_textures = textures_from_assimp(mat, aiTextureType_SPECULAR, TEXTURE_TYPE_SPECULAR, workdir);        
 
-        // we need to check that texture not already loaded into our memory
-        // mean that for different mesh they can use same texture
-        // so if this texture already loaded - skip it 
+        for(uint8_t i = 0; i < darray_lenght(diffuse_textures); ++i){
+            texture t = (texture) darray_at(diffuse_textures, i);
+            darray_emplace_back(textures, t);
+        }
 
+        for(uint8_t i = 0; i < darray_lenght(specular_textures); ++i){
+            texture t = (texture) darray_at(specular_textures, i);
+            darray_emplace_back(textures, t);
+        }
 
-
-        // vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
-        // {
-        //     vector<Texture> textures;
-        //     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-        //     {
-        //         aiString str;
-        //         mat->GetTexture(type, i, &str);
-        //         Texture texture;
-        //         texture.id = TextureFromFile(str.C_Str(), directory);
-        //         texture.type = typeName;
-        //         texture.path = str;
-        //         textures.push_back(texture);
-        //     }
-        //     return textures;
-        // }
-
-
+        darray_free(diffuse_textures);
+        darray_free(specular_textures);
     }
 
 

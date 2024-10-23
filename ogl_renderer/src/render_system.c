@@ -2,6 +2,10 @@
 #include "containers/darray.h"
 #include "picel_math.h"
 
+#include "mesh2.h"
+#include "texture2.h"
+#include "scene.h"
+
 
 void render_system_render(ecs ecs, window w, camera main_camera, shader gs, GLuint dvao){
     // matrix4f view = camera_get_view(main_camera);
@@ -192,4 +196,29 @@ void render_system_render(ecs ecs, window w, camera main_camera, shader gs, GLui
 
 
 
+}
+
+
+// renderer start
+void render_mesh(mesh mesh, shader sh){
+    glUseProgram(sh.program); // if it is not used yet
+    mesh_to_gpu(mesh);
+
+
+    mesh_activate_textures(mesh, sh);
+    glActiveTexture(GL_TEXTURE0);
+
+    //draw
+    glBindVertexArray(mesh_vao(mesh));
+    glDrawElements(GL_TRIANGLES, mesh_indices_len(mesh), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+}
+
+void render_scene(shader sh, scene s){
+    darray meshes = scene_get_meshes(s);
+    for(int i = 0; i < darray_lenght(meshes), ++i){
+        mesh m = (mesh) darray_at(meshes, i);
+        render_mesh(m, sh);
+    }
 }

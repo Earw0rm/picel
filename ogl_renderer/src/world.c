@@ -1,7 +1,7 @@
 #include "world.h"
 #include "picel_math.h"
 #include "event_system.h"
-
+#include "scene.h"
 
 static struct store{
     ecs ecs;
@@ -13,7 +13,7 @@ static struct store{
     //mutex for each concurrent resources
     shader grid_shader;
     GLuint dummy_vao;
-
+    scene scene;
 } store;
 
 
@@ -57,13 +57,17 @@ void world_init(void){
     }
 
 
-
     glGenVertexArrays(1, &store.dummy_vao);
     if(glGetError() != GL_NO_ERROR){
         LOG_FATAL("cannot generate dummy vao");
         exit(-1);
     }
 
+    store.scene = scene_load("./resources/untitled.obj");
+    if(store.scene == nullptr){
+        LOG_FATAL("cannot instanciate scene");
+        exit(-1);
+    }
 
 }
 

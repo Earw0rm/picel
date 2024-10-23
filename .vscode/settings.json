@@ -64,7 +64,11 @@
         "span": "c",
         "cimport.h": "c",
         "scene.h": "c",
-        "postprocess.h": "c"
+        "postprocess.h": "c",
+        "variant": "c",
+        "__hash_table": "c",
+        "forward_list": "c",
+        "scene_loader.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

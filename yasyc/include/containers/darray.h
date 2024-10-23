@@ -34,4 +34,8 @@ API void _darray_push_back(darray da, void* elem);
     _darray_push_back(dq, (void*) &val);     \
 } while(0)       
 
+#define darray_emplace_back(dq, pointer) do{ \
+    _darray_push_back(dq, (void*) pointer);  \
+} while(0)
+
 #endif 
