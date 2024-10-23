@@ -55,6 +55,12 @@ dir_from_path(const char* path) {
     
     return nullptr;
 }
+void scene_log_table_objects(scene s){
+    for(uint8_t i = 0; i < darray_lenght(s->meshes); ++i){
+        mesh2* m = (mesh2*)darray_at(s->meshes, i);
+        LOG_INFO("Mesh addr %p has %i textures", *m, mesh_textures_len(*m));        
+    }
+}
 
 scene scene_load(const char* filepath){
     scene internal_scene = malloc(sizeof(struct scene_impl));

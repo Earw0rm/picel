@@ -1,17 +1,17 @@
 #version 330 core
 //http://devernay.free.fr/cours/opengl/materials.html
 struct material{
-    sampler2D texture_specular_0
-    sampler2D texture_specular_1
-    sampler2D texture_specular_2
-    sampler2D texture_specular_3
-    sampler2D texture_specular_4
+    sampler2D texture_specular_0;
+    sampler2D texture_specular_1;
+    sampler2D texture_specular_2;
+    sampler2D texture_specular_3;
+    sampler2D texture_specular_4;
 
-    sampler2D texture_diffuse__0
-    sampler2D texture_diffuse__1
-    sampler2D texture_diffuse__2
-    sampler2D texture_diffuse__3
-    sampler2D texture_diffuse__4
+    sampler2D texture_diffuse__0;
+    sampler2D texture_diffuse__1;
+    sampler2D texture_diffuse__2;
+    sampler2D texture_diffuse__3;
+    sampler2D texture_diffuse__4;
 
     vec3 ambient;
     vec3 diffuse;

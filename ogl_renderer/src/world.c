@@ -68,7 +68,7 @@ void world_init(void){
         LOG_FATAL("cannot instanciate scene");
         exit(-1);
     }
-
+    scene_log_table_objects(store.scene);
 }
 
 void world_destroy(void){
