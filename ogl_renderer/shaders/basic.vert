@@ -12,7 +12,6 @@ uniform mat4 view;
 uniform mat4 projection;
 
 out vec2 tex_coord;
-out vec4 fragment_in_color;
 out vec3 fragment_normals;
 out vec3 fragment_position_of_fragment;
 

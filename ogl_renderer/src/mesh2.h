@@ -20,7 +20,7 @@ uint64_t mesh_vertices_len(mesh2 mesh);
 uint64_t mesh_indices_len(mesh2 mesh);
 uint64_t mesh_textures_len(mesh2 mesh);
 void mesh_activate_textures(mesh2 mesh, shader sh);
-
+void mesh_active(mesh2 mesh, shader sp);
 // runtime only
 size_t mesh_sizeof(void);
 

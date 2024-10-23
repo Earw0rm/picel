@@ -50,12 +50,26 @@ uint64_t mesh_textures_len(mesh2 mesh){
     return darray_lenght(mesh->textures);
 }
 
+void mesh_active(mesh2 mesh, shader sp){
+    if(mesh->is_initialized) {
+        mesh_to_gpu(mesh);
+    }
+    
+    glBindVertexArray(mesh->vao);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    mesh_activate_textures(mesh, sp);    
+}
+
 /**
  * load mesh into gpu. Fill vbo/ebo/vao.
  * If mesh has textures, load them into gpu too.
  */
 void mesh_to_gpu(mesh2 mesh){
-    if(mesh->is_initialized) return;
+    if(mesh->is_initialized) {
+        return;
+    }
 
     glGenVertexArrays(1, &mesh->vao);
     glGenBuffers(1, &mesh->vbo);

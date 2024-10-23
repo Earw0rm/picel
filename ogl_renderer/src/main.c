@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "world.h"
 #include "gui_system.h"
+#include "scene.h"
 // this 2 include for library testing if we need to compare result against hand made picel_math.h
 // #include <cglm/cglm.h>   /* for inline */
 // #include <cglm/call.h>   /* for library call (this also includes cglm.h) */
@@ -98,18 +99,20 @@ int main(int argc, char const *argv[]){
         //todo now it is crunch
         basic_scene_setup();
 
-        ecs ecs = world_get_ecs();
-        camera main_camera = world_get_main_camera();
-        window main_window = world_get_main_window();
-        shader gs = world_get_grid_shader();
-        GLuint vao = world_get_dummy_vao();
+        [[gnu::unused]]ecs ecs = world_get_ecs();
+        [[gnu::unused]]camera main_camera = world_get_main_camera();
+        [[gnu::unused]]window main_window = world_get_main_window();
+        [[gnu::unused]]shader gs = world_get_grid_shader();
+        [[gnu::unused]]GLuint vao = world_get_dummy_vao();
+        [[gnu::unused]]scene scene = world_get_scene();
 
         gui_system_init(main_window, 512 * 1024, 128 * 1024);
 
 
         while(!win_should_close(main_window)){
 
-            render_system_render(ecs, main_window, main_camera, gs, vao);
+            // render_system_render(ecs, main_window, main_camera, gs, vao);
+            render_system_render2(scene, main_window, main_camera, gs);
             gui_system_render(main_window);
 
             win_swap_buffers(main_window);

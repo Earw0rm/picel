@@ -7,5 +7,5 @@
 
 
 void render_system_render(ecs ecs, window w, camera main_camera, shader gs, GLuint dvao);
-
+void render_system_render2(scene scene, window w, camera main_camera, shader gs);
 #endif 

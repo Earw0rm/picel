@@ -7,7 +7,7 @@
 #include "shader.h"
 #include "mesh.h"
 #include "texture.h"
-
+#include "scene.h"
 // this is context manageg. Holding all possible global resources and protect them by mutex
 // TODO impliment concurrent access 
 void world_init(void);
@@ -23,5 +23,6 @@ window world_get_main_window(void);
 texture world_get_basic_texture(void);
 
 GLuint world_get_dummy_vao(void);
+scene world_get_scene(void);
 
 #endif 

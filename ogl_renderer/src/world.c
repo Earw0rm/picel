@@ -82,7 +82,9 @@ void world_destroy(void){
 }
 
 
-
+scene world_get_scene(void){
+    return store.scene;
+}
 // we need mutex and some amgic to protect this
 ecs world_get_ecs(void){
     return store.ecs;
