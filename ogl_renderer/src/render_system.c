@@ -117,7 +117,13 @@ void render_scene(shader sh, scene s){
         render_mesh(*m, sh);
     }
 }
-
+static inline GLint find_loc_or_warn(GLint program, const char* loc_name){
+    GLint loc = glGetUniformLocation(program, loc_name);
+    if(loc == -1){
+        LOG_WARN("cannot find %s location", loc_name);
+    }
+    return loc;
+}
 
 void render_system_render2(scene scene, window w, camera main_camera, shader gs){
 
@@ -131,43 +137,22 @@ void render_system_render2(scene scene, window w, camera main_camera, shader gs)
     vector3f light_source_position = v3f(-2, 2, -5);
     vector3f light_ambient         = v3f(1, 1, 1);
     vector3f light_diffuse         = v3f(1, 1, 1);
-    vector3f light_specular        = v3f(1, 1, 1);        
-    GLint model_loc      = glGetUniformLocation(gs.program, "model");
-    GLint view_loc       = glGetUniformLocation(gs.program, "view");
-    GLint projection_loc = glGetUniformLocation(gs.program, "projection");    
+    vector3f light_specular        = v3f(1, 1, 1);
+
+    GLint model_loc          = find_loc_or_warn(gs.program, "model");
+    GLint view_loc           = find_loc_or_warn(gs.program, "view");
+    GLint projection_loc     = find_loc_or_warn(gs.program, "projection");    
     //material structure inside fragment shader
-    GLint mat_ambient_loc   = glGetUniformLocation(gs.program, "mat.ambient");
-    if(mat_ambient_loc == -1){
-        LOG_WARN("cannot find mat_ambient_location");
-    }
-    GLint mat_diffuse_loc   = glGetUniformLocation(gs.program, "mat.diffuse");
-    if(mat_diffuse_loc == -1){
-        LOG_WARN("cannot find mat_diffuse_location");
-    }
-    GLint mat_specular_loc  = glGetUniformLocation(gs.program, "mat.specular");
-    if(mat_specular_loc == -1){
-        LOG_WARN("cannot find mat_specular_location");
-    }
-    GLint mat_shininess_loc = glGetUniformLocation(gs.program, "mat.shininess");                
-    if(mat_shininess_loc == -1){
-        LOG_WARN("cannot find mat_shininess_locaction");
-    }
-    GLint light_position_loc = glGetUniformLocation(gs.program, "lig.position");                
-    if(light_position_loc == -1){
-        LOG_WARN("cannot find light position");
-    }
-    GLint light_ambient_loc = glGetUniformLocation(gs.program, "lig.ambient");                
-    if(light_ambient_loc == -1){
-        LOG_WARN("cannot find light_ambient_location");
-    }
-    GLint light_diffuse_loc = glGetUniformLocation(gs.program, "lig.diffuse");                
-    if(light_diffuse_loc == -1){
-        LOG_WARN("cannot find light_diffuse_location");
-    }
-    GLint light_specular_loc = glGetUniformLocation(gs.program, "lig.specular");                
-    if(light_specular_loc == -1){
-        LOG_WARN("cannot find light_specular_location");
-    }
+    GLint mat_ambient_loc    = find_loc_or_warn(gs.program, "mat.ambient");
+    GLint mat_diffuse_loc    = find_loc_or_warn(gs.program, "mat.diffuse");
+    GLint mat_specular_loc   = find_loc_or_warn(gs.program, "mat.specular");
+    GLint mat_shininess_loc  = find_loc_or_warn(gs.program, "mat.shininess");                
+    GLint light_position_loc = find_loc_or_warn(gs.program, "lig.position");                
+    GLint light_ambient_loc  = find_loc_or_warn(gs.program, "lig.ambient");                
+    GLint light_diffuse_loc  = find_loc_or_warn(gs.program, "lig.diffuse");                
+    GLint light_specular_loc = find_loc_or_warn(gs.program, "lig.specular");                
+
+
     matrix4f model = mat4f_id(1);
     vector3f ambient = v3f_id(1);
     vector3f diffuse = v3f_id(1);
